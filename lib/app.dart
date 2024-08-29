@@ -1,4 +1,5 @@
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
+import 'package:acesso_mapeado/pages/profile_user_page.dart';
 import 'package:acesso_mapeado/pages/splash_page.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class App extends StatelessWidget {
     return const MaterialApp(
       // home: SplashPage(),
       home: OnboardingPage(),
+      // home: ProfileUserPage()
     );
   }
 }

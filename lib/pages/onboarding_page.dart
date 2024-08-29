@@ -1,3 +1,4 @@
+import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class OnboardingPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const SignUpPage()),
+                    MaterialPageRoute(builder: (context) => const SignInPage()),
                   );
                 },
                 style: ElevatedButton.styleFrom(

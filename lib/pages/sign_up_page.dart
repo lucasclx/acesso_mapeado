@@ -95,8 +95,7 @@ class SignUpPage extends StatelessWidget {
                               horizontal: 16.0, vertical: 12.0)),
                       obscureText: true,
                     ),
-                    const SizedBox(height: 20),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
                     ElevatedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -112,7 +111,7 @@ class SignUpPage extends StatelessWidget {
                         'Cadastrar',
                         style: TextStyle(
                             color: AppColors.white,
-                            fontWeight: FontWeight.bold),
+                            fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                     ),
                   ],
