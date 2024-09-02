@@ -1,11 +1,18 @@
 import 'package:acesso_mapeado/pages/home_page.dart';
-import 'package:acesso_mapeado/pages/profile_user_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
+import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class SignInPage extends StatelessWidget {
+class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
+
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
+
+class _SignInPageState extends State<SignInPage> {
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,7 @@ class SignInPage extends StatelessWidget {
             ]),
           ),
           leading: IconButton(
-              icon: Image.asset('assets/icons/arrow.png'),
+              icon: Image.asset('assets/icons/arrow-left.png'),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -58,13 +65,38 @@ class SignInPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Senha',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
+                      border: const OutlineInputBorder(),
+                      contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16.0, vertical: 12.0),
+                      suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          }),
                     ),
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            'Esqueci a senha?',
+                            style: TextStyle(
+                                color: AppColors.lightPurple,
+                                fontWeight: FontWeight.bold),
+                          ))
+                    ],
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
@@ -85,6 +117,28 @@ class SignInPage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: 18),
                     ),
+                  ),
+                  const SizedBox(height: 45),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Não tem uma conta?'),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpPage()),
+                          );
+                        },
+                        child: const Text(
+                          'Cadastre-se',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.lightPurple),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ))
