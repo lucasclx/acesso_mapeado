@@ -21,7 +21,7 @@ class SignUpPage extends StatelessWidget {
             ]),
           ),
           leading: IconButton(
-            icon: Image.asset('assets/icons/arrow.png'),
+            icon: Image.asset('assets/icons/arrow-left.png'),
             onPressed: () {
               Navigator.push(
                   context,
@@ -111,7 +111,8 @@ class SignUpPage extends StatelessWidget {
                         'Cadastrar',
                         style: TextStyle(
                             color: AppColors.white,
-                            fontWeight: FontWeight.bold, fontSize: 18),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
                       ),
                     ),
                   ],
