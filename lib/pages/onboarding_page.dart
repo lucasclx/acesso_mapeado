@@ -13,8 +13,8 @@ class OnboardingPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // vertical
-          crossAxisAlignment: CrossAxisAlignment.center, // horizontal
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 55),
             Image.asset('assets/images/img-accessibility.png', height: 350),
@@ -35,12 +35,12 @@ class OnboardingPage extends StatelessWidget {
                       text: ' Acesso Mapeado.',
                       style: TextStyle(
                         color: AppColors
-                            .lightPurple, // Cor rosa para "Acesso Mapeado"
+                            .lightPurple, 
                       ),
                     ),
                     TextSpan(
                       text: ' Juntos por um mundo mais inclusivo!',
-                      style: TextStyle(color: Colors.black), // Cor padrão
+                      style: TextStyle(color: Colors.black),
                     ),
                   ],
                 ),
@@ -97,13 +97,12 @@ class OnboardingPage extends StatelessWidget {
                 const Text('Esqueceu a senha?'),
                 TextButton(
                   onPressed: () {
-                    // Navegar para a página de redefinição de senha ou outra ação
                   },
                   child: const Text(
                     'Redefinir senha',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.lightPurple), // Estilo do texto
+                        color: AppColors.lightPurple),
                   ),
                 ),
               ],
