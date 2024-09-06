@@ -1,5 +1,5 @@
+import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
-import 'package:acesso_mapeado/shared/app_text_styles.dart';
 import 'package:flutter/material.dart';
 
 class SplashPage extends StatelessWidget {
@@ -7,18 +7,36 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const OnboardingPage()),
+      );
+    });
     return Scaffold(
-        body: Container(
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.center,
-                    end: Alignment.bottomCenter,
-                    colors: [AppColors.lightPurple, AppColors.darkPurple])),
-            child: Text(
+      backgroundColor: AppColors.veryLightPurple,
+      body: Container(
+        alignment: Alignment.center,
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image(
+              image: AssetImage('assets/images/logo-acesso-mapeado.png'),
+              width: 150,
+              height: 150,
+            ),
+            SizedBox(height: 20),
+            Text(
               'Acesso Mapeado',
-              style: AppTextStyles.splashTitleStyle
-                  .copyWith(color: AppColors.white),
-            )));
+              style: TextStyle(
+                  color: AppColors.lightPurple,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
