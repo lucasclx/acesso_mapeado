@@ -1,4 +1,6 @@
 import 'package:acesso_mapeado/pages/profile_user_page.dart';
+import 'package:acesso_mapeado/pages/ranking_page.dart';
+import 'package:acesso_mapeado/pages/rate_page.dart';
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  // -------- ToDo: Remover Código repetido -------------
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -27,7 +31,10 @@ class _HomePageState extends State<HomePage> {
         // Navegar para o bate-papo
         break;
       case 2:
-        // Navegar para o ranking
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RankingPage()),
+        );
         break;
       case 3:
         Navigator.push(
@@ -152,6 +159,14 @@ class _HomePageState extends State<HomePage> {
               child: ListView(
                 controller: scrollController,
                 children: [
+                  const SizedBox(
+                    height: 40.0,
+                    width: 50.0,
+                    child: Divider(
+                      color: AppColors.lightGray,
+                      thickness: 2.0,
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -200,6 +215,53 @@ class _HomePageState extends State<HomePage> {
                             'assets/images/img-company.png'),
                         height: 150,
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 30.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.lightPurple),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: TextButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RatePage(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.star,
+                                color: AppColors.lightPurple),
+                            label: const Text(
+                              'Avaliar',
+                              style: TextStyle(color: AppColors.lightPurple),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(left: 10),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.lightPurple),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: TextButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.message_outlined,
+                                color: AppColors.lightPurple),
+                            label: const Text(
+                              'Chat',
+                              style: TextStyle(color: AppColors.lightPurple),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Padding(
@@ -286,10 +348,10 @@ class _HomePageState extends State<HomePage> {
                         icon = Icons.accessible;
                         break;
                       case "Acessibilidade Comunicacional":
-                        icon = Icons.hearing;
+                        icon = Icons.spatial_audio_off;
                         break;
                       case "Acessibilidade Sensorial":
-                        icon = Icons.visibility;
+                        icon = Icons.favorite;
                         break;
                       case "Acessibilidade Atitudinal":
                         icon = Icons.person;
@@ -691,14 +753,17 @@ class _HomePageState extends State<HomePage> {
               label: 'Início',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.white,
               icon: Icon(Icons.chat_outlined),
               label: 'Bate-Papo',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.white,
               icon: Icon(Icons.bar_chart_outlined),
               label: 'Ranking',
             ),
             BottomNavigationBarItem(
+              backgroundColor: AppColors.white,
               icon: Icon(Icons.person),
               label: 'Perfil',
             ),
