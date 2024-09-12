@@ -2,6 +2,7 @@ import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/profile_user_page.dart';
 import 'package:acesso_mapeado/pages/rate_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:flutter/material.dart';
 
 class RankingPage extends StatefulWidget {
@@ -12,18 +13,19 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> {
-// -------- ToDo: Remover Código repetido -------------
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
-  void _onItemTapped(int index) {
+  void _navigate(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navegar para a página correspondente com base no índice
     switch (index) {
       case 0:
-        // Navegar para a página inicial
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
         break;
       case 1:
         // Navegar para o bate-papo
@@ -43,30 +45,30 @@ class _RankingPageState extends State<RankingPage> {
     }
   }
 
-  // Dados de acessibilidade (Itens que vão ficar no firebase, para o filtro de acessibilidade)
-  final Map<String, List<Map<String, dynamic>>> _accessibilityData = {
-    "Acessibilidade Física": [
-      {"tipo": "Rampas", "status": false},
-      {"tipo": "Elevadores", "status": false},
-      {"tipo": "Portas Largas", "status": false},
-      {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
-      {"tipo": "Estacionamento Reservado", "status": false}
-    ],
-    "Acessibilidade Comunicacional": [
-      {"tipo": "Sinalização com Braille e Pictogramas", "status": false},
-      {"tipo": "Informações Visuais Claras e Contrastantes", "status": false},
-      {"tipo": "Dispositivos Auditivos", "status": false},
-      {"tipo": "Documentos e Materiais em Formatos Acessíveis", "status": false}
-    ],
-    "Acessibilidade Sensorial": [
-      {"tipo": "Iluminação Adequada", "status": false},
-      {"tipo": "Redução de Ruídos", "status": false}
-    ],
-    "Acessibilidade Atitudinal": [
-      {"tipo": "Treinamento de Funcionários", "status": false},
-      {"tipo": "Políticas Inclusivas", "status": false}
-    ],
+// Dados sobre ranking das empresas (Itens que vão ficar no firebase)
+  final Map<String, List<Map<String, dynamic>>> _companyRakingData = {
+    'company': [
+      {
+        'name': 'Empresa 1',
+        'rating': 4,
+        'imageUrl': 'assets/images/img-company.png'
+      },
+      {
+        'name': 'Empresa 2',
+        'rating': 4,
+        'imageUrl': 'assets/images/img-company.png'
+      },
+      {
+        'name': 'Empresa 3',
+        'rating': 3,
+        'imageUrl': 'assets/images/img-company.png'
+      },
+      {
+        'name': 'Empresa 4',
+        'rating': 2,
+        'imageUrl': 'assets/images/img-company.png'
+      },
+    ]
   };
 
   // Dados da empresa
@@ -521,7 +523,7 @@ class _RankingPageState extends State<RankingPage> {
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
                   const Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Text(
@@ -632,7 +634,7 @@ class _RankingPageState extends State<RankingPage> {
           },
         ),
       ),
-      body: Padding(
+       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
@@ -642,43 +644,58 @@ class _RankingPageState extends State<RankingPage> {
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.darkGray, fontSize: 18),
             ),
-            const SizedBox(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text('1. '),
-                const SizedBox(width: 6),
-                const CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/img-company.png'),
-                  radius: 25,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.lightPurple),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextButton.icon(
-                    onPressed: _showAccessibilitySheet,
-                    label: const Text(
-                      'Saiba mais',
-                      style: TextStyle(color: AppColors.lightPurple),
+            const SizedBox(height: 30),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _companyRakingData['company']?.length ?? 0,
+                itemBuilder: (context, index) {
+                  final company = _companyRakingData['company']![index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: AssetImage(company['imageUrl'] ?? ''),
+                      radius: 29,
                     ),
-                  ),
-                ),
-                const Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    Icon(Icons.star, color: Colors.grey, size: 20),
-                    Icon(Icons.star, color: Colors.grey, size: 20),
-                  ],
-                )
-              ],
-            )
+                    title: Text(company['name'] ?? ''),
+                    subtitle: Row(
+                      children: List.generate(5, (starIndex) {
+                        return Icon(
+                          Icons.star,
+                          color: starIndex < (company['rating'] ?? 0)
+                              ? Colors.yellow
+                              : Colors.grey,
+                          size: 20,
+                        );
+                      }),
+                    ),
+                    trailing: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.lightPurple),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _companyData["name"] = company['name'];
+                            _companyData["rating"] = company['rating'];
+                            _companyData["imageUrl"] = company['imageUrl'];
+                          });
+                          _showAccessibilitySheet();
+                        },
+                        label: const Text(
+                          'Saiba mais',
+                          style: TextStyle(color: AppColors.lightPurple),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
+      bottomNavigationBar:
+          AppNavbar(selectedIndex: _selectedIndex, onItemTapped: _navigate),
     );
   }
 }

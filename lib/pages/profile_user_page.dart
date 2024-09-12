@@ -1,9 +1,49 @@
 import 'package:acesso_mapeado/pages/home_page.dart';
+import 'package:acesso_mapeado/pages/ranking_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
-class ProfileUserPage extends StatelessWidget {
+class ProfileUserPage extends StatefulWidget {
   const ProfileUserPage({super.key});
+
+  @override
+  State<ProfileUserPage> createState() => _ProfileUserPageState();
+}
+
+class _ProfileUserPageState extends State<ProfileUserPage> {
+  int _selectedIndex = 3;
+
+  void _navigate(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+        break;
+      case 1:
+        // Navegar para o bate-papo
+        break;
+      case 2:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RankingPage()),
+        );
+        break;
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProfileUserPage()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,6 +208,8 @@ class ProfileUserPage extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar:
+          AppNavbar(selectedIndex: _selectedIndex, onItemTapped: _navigate),
     );
   }
 }
