@@ -2,7 +2,6 @@ import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatePage extends StatefulWidget {
