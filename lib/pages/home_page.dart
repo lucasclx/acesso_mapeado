@@ -3,6 +3,7 @@ import 'package:acesso_mapeado/pages/ranking_page.dart';
 import 'package:acesso_mapeado/pages/rate_page.dart';
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
+import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -13,19 +14,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  // -------- ToDo: Remover Código repetido -------------
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  void _navigate(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navegar para a página correspondente com base no índice
     switch (index) {
       case 0:
-        // Navegar para a página inicial
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
         break;
       case 1:
         // Navegar para o bate-papo
@@ -732,45 +733,9 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.darkGray.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          selectedItemColor: AppColors.lightPurple,
-          unselectedItemColor: AppColors.lightGray,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              backgroundColor: AppColors.white,
-              icon: Icon(Icons.map_outlined),
-              label: 'Início',
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: AppColors.white,
-              icon: Icon(Icons.chat_outlined),
-              label: 'Bate-Papo',
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: AppColors.white,
-              icon: Icon(Icons.bar_chart_outlined),
-              label: 'Ranking',
-            ),
-            BottomNavigationBarItem(
-              backgroundColor: AppColors.white,
-              icon: Icon(Icons.person),
-              label: 'Perfil',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
+      bottomNavigationBar: AppNavbar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _navigate,
       ),
     );
   }
