@@ -6,7 +6,10 @@ import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     App(initialRoutes: '/', routes: {
       '/': (context) => const OnboardingPage(),

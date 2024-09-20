@@ -1,8 +1,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+
+
+ 
     <application
         android:label="acesso_mapeado"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+
+           <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyBx5dF4DRM4hLSff5wls8FGh-LFeD3zn08"/>
+
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

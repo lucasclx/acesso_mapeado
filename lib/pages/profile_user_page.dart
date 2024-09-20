@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/ranking_page.dart';
 import 'package:acesso_mapeado/shared/app_colors.dart';
@@ -14,6 +16,32 @@ class ProfileUserPage extends StatefulWidget {
 
 class _ProfileUserPageState extends State<ProfileUserPage> {
   int _selectedIndex = 3;
+
+  File? imageFile;
+
+  // final ImagePicker _picker = ImagePicker();
+  final imagePicker = ImagePicker();
+
+  // Future<void> _pickImage() async {
+  //   final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _image = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+
+  pick(ImageSource source) async {
+   final pickedFile = await imagePicker.pickImage(source: source);
+   
+   if (pickedFile != null) {
+     setState(() {
+       imageFile = File(pickedFile.path);
+     });
+   }   
+
+  }
 
   void _navigate(int index) {
     setState(() {
@@ -75,11 +103,46 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            const SizedBox(height: 30),
+            const SizedBox(height: 15),
             Expanded(
               child: ListView(
                 children: <Widget>[
                   const SizedBox(height: 20),
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage: imageFile != null
+                              ? FileImage(
+                                  imageFile!) // Mostrar a imagem selecionada
+                              : AssetImage('assets/images/placeholder-user.png')
+                                  as ImageProvider, // Imagem padrão
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: const BoxDecoration(
+                                color: AppColors.veryLightPurple,
+                                shape: BoxShape.circle),
+                            child: IconButton(
+                              onPressed: _showOpcoesBottomSheet,
+                              icon: const Icon(
+                                Icons.camera_alt,
+                                color: AppColors.lightPurple,
+                                size: 23,
+                              ),
+                              // onPressed: _pickImage, // Selecionar imagem
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 45),
                   TextFormField(
                     decoration: const InputDecoration(
                         labelText: 'Nome',
@@ -210,6 +273,84 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       ),
       bottomNavigationBar:
           AppNavbar(selectedIndex: _selectedIndex, onItemTapped: _navigate),
+    );
+  }
+
+  void _showOpcoesBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.grey[200],
+                  // child: Center(
+                  //   // child: Icon(
+                  //   //   // PhosphorIcons.regular.image,
+                  //   //   // color: Colors.grey[500],
+                  //   // ),
+                  // ),
+                ),
+                title: Text(
+                  'Galeria',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // Buscar imagem da galeria
+                  pick(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.grey[200],
+                  // child: Center(
+                  //   child: Icon(
+                  //     // PhosphorIcons.regular.camera,
+                  //     // color: Colors.grey[500],
+                  //   ),
+                  // ),
+                ),
+                title: Text(
+                  'Câmera',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // Fazer foto da câmera
+                  pick(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.grey[200],
+                  // child: Center(
+                  //   child: Icon(
+                  //     // PhosphorIcons.regular.trash,
+                  //     // color: Colors.grey[500],
+                  //   ),
+                  // ),
+                ),
+                title: Text(
+                  'Remover',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  // Tornar a foto null
+                  setState(() {
+                    imageFile = null;
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
