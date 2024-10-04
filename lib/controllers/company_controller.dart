@@ -1,18 +1,38 @@
 import 'package:acesso_mapeado/models/company_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CompanyController {
-//getAllCompanies
-
   Future<List<CompanyModel>> getAllCompanies() async {
     try {
-      final companies =
+      final companiesSnapshot =
           await FirebaseFirestore.instance.collection('companies').get();
-      return companies.docs.map((doc) => CompanyModel.fromJson(doc)).toList();
+
+      // Verificação de se a lista de docs não está vazia
+      if (companiesSnapshot.docs.isEmpty) {
+        print('Nenhuma empresa encontrada');
+        return [];
+      }
+
+      print(
+          'Empresas: ${companiesSnapshot.docs.length}'); // Imprime o número de documentos
+
+      // Mapeando os dados para CompanyModel
+      return companiesSnapshot.docs
+          .map((doc) {
+            final data = doc.data();
+            if (data != null && data is Map<String, dynamic>) {
+              return CompanyModel.fromJson(data);
+            } else {
+              print('Documento com formato inválido: ${doc.id}');
+              return null; // Pular documentos inválidos
+            }
+          })
+          .whereType<CompanyModel>() // Filtrar os nulos
+          .toList();
     } catch (error) {
       print('Error getting documents: $error');
       return [];
-    } finally // finally is called every time after try or catch
-    {}
+    }
   }
 
   Future<bool> createCompany(CompanyModel company) async {

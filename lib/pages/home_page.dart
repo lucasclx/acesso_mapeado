@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
 
   getCompanies() async {
     companies = await companyController.getAllCompanies();
+    print("Testeeeee");
     setState(() {});
   }
 
@@ -739,7 +740,7 @@ class _HomePageState extends State<HomePage> {
                   IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
-                      _showAccessibilitySheet();
+                      // _showAccessibilitySheet( companyMdel);
                     },
                   ),
                 ],
