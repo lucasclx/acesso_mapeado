@@ -1,3 +1,4 @@
+import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
@@ -15,6 +16,14 @@ class RatePage extends StatefulWidget {
 }
 
 class _RatePageState extends State<RatePage> {
+  TextEditingController _comment = TextEditingController();
+  CompanyController _company = CompanyController();
+
+  addComment() async {
+    await _company.addUserComment(widget.company.name, _comment.text);
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,35 +114,18 @@ class _RatePageState extends State<RatePage> {
             ),
           ),
           const SizedBox(height: 16.0),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    hintText: 'Deixe seu título',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              maxLines: 4,
+              controller: _comment,
+              decoration: InputDecoration(
+                hintText: 'Conte como foi sua experiência neste lugar',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              const SizedBox(height: 16.0), // Espaço entre os campos
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: TextField(
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                    hintText: 'Conte como foi sua experiência neste lugar',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -149,13 +141,15 @@ class _RatePageState extends State<RatePage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                addComment();
+              },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),
                 backgroundColor: AppColors.lightPurple,
               ),
               child: const Text(
-                'Salvar',
+                'Enviar avaliação',
                 style: TextStyle(color: AppColors.white, fontSize: 18),
               ),
             ),
