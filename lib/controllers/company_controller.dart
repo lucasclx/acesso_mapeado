@@ -167,4 +167,42 @@ class CompanyController {
       Logger.logInfo('Ratings atuais: ${data['ratings']}');
     }
   }
+
+  // Função para adicionar comentario do usuario na empresa
+  Future<bool> addUserComment(String companyId, String comment) async {
+    String companyId = '2mzbcytEWZyhpFihwKTk';
+
+    try {
+      final docSnapshot = await _companiesCollection.doc(companyId).get();
+
+      if (!docSnapshot.exists) {
+        Logger.logInfo('Empresa não encontrada.');
+        return false;
+      }
+
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+      List<Map<String, dynamic>> commentsData =
+          List<Map<String, dynamic>>.from(data['commentsData'] ?? []);
+
+      var commentData = {
+        'userName': 'João Silva',
+        'userImage': 'https://via.placeholder.com/50.png?text=João',
+        'text': comment,
+        'date': DateTime.now().toString(),
+      };
+
+      commentsData.add(commentData);
+
+      await _companiesCollection.doc(companyId).update({
+        'commentsData': commentsData,
+      });
+
+      Logger.logInfo('Comentário do usuário adicionado com sucesso.');
+      return true;
+    } catch (e) {
+      Logger.logInfo('Erro ao adicionar comentário do usuário: $e');
+      return false;
+    }
+  }
 }
