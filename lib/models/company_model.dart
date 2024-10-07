@@ -1,4 +1,7 @@
+import 'package:uuid/uuid.dart';
+
 class CompanyModel {
+  String uuid;
   String name;
   double latitude;
   double longitude;
@@ -11,11 +14,14 @@ class CompanyModel {
   List<Map<String, dynamic>>? commentsData;
   Map<String, dynamic>? performanceData;
   List<double>? ratings;
-  String? cnpj;
+  String cnpj;
   String? registrationDate;
   String? about;
 
+  static const _uuid = Uuid();
+
   CompanyModel({
+    String? uuid,
     required this.name,
     required this.latitude,
     required this.longitude,
@@ -28,13 +34,14 @@ class CompanyModel {
     this.commentsData,
     this.performanceData,
     this.ratings,
-    this.cnpj,
+    required this.cnpj,
     this.registrationDate,
     this.about,
-  });
+  }) : uuid = uuid ?? _uuid.v4();
 
   // Método factory para criar instâncias de CompanyModel a partir de um JSON
   factory CompanyModel.fromJson(Map<String, dynamic> json) => CompanyModel(
+        uuid: json["uuid"],
         name: json['name'],
         latitude: (json['latitude'] as num).toDouble(),
         longitude: (json['longitude'] as num).toDouble(),
@@ -63,7 +70,7 @@ class CompanyModel {
         ratings: json['ratings'] != null
             ? List<double>.from((json['ratings'] as List)
                 .map((item) => (item as num).toDouble()))
-            : [], 
+            : [],
         cnpj: json['cnpj'],
         registrationDate: json['registrationDate'],
         about: json['about'],
@@ -71,6 +78,7 @@ class CompanyModel {
 
   // Método para converter instâncias de CompanyModel para JSON
   Map<String, dynamic> toJson() => {
+        'uuid': uuid,
         'name': name,
         'latitude': latitude,
         'longitude': longitude,
