@@ -83,4 +83,88 @@ class CompanyController {
       return false;
     }
   }
+
+  // Função para editar a empresa e atualizar o rating baseado na média dos ratings
+  Future<bool> updateCompanyRating(String companyId) async {
+    try {
+      // Obter o documento da empresa
+      final docSnapshot = await _companiesCollection.doc(companyId).get();
+
+      if (!docSnapshot.exists) {
+        Logger.logInfo('Empresa não encontrada.');
+        return false;
+      }
+
+      CompanyModel company = CompanyModel.fromJson(
+        docSnapshot.data() as Map<String, dynamic>,
+      );
+
+      if (company.ratings!.isEmpty) {
+        Logger.logInfo('Empresa não possui ratings.');
+        return false;
+      }
+      double averageRating =
+          company.ratings!.reduce((a, b) => a + b) / company.ratings!.length;
+
+      await _companiesCollection.doc(companyId).update({
+        'rating': averageRating,
+      });
+
+      Logger.logInfo('Rating atualizado com sucesso para $averageRating.');
+      return true;
+    } catch (e) {
+      Logger.logInfo('Erro ao atualizar o rating da empresa: $e');
+      return false;
+    }
+  }
+
+  // Função para adicionar o rating de um usuário à empresa
+  Future<bool> addCompanyUserRating(String companyId, double userRating) async {
+    try {
+      final docSnapshot = await _companiesCollection.doc(companyId).get();
+
+      if (!docSnapshot.exists) {
+        Logger.logInfo('Empresa não encontrada.');
+        return false;
+      }
+
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+
+      List<double> ratings = List<double>.from(data['ratings'] ?? []);
+
+      ratings.add(userRating);
+
+      await _companiesCollection.doc(companyId).update({
+        'ratings': ratings,
+      });
+
+      await updateCompanyRating(companyId);
+
+      Logger.logInfo('Rating do usuário adicionado com sucesso.');
+      return true;
+    } catch (e) {
+      Logger.logInfo('Erro ao adicionar rating do usuário: $e');
+      return false;
+    }
+  }
+
+  // Função para adição de um rating
+  Future<void> addUserRating() async {
+    String companyId = '2mzbcytEWZyhpFihwKTk';
+    double userRating = 0;
+
+    bool result = await addCompanyUserRating(companyId, userRating);
+
+    if (result) {
+      Logger.logInfo('Rating adicionado com sucesso.');
+    } else {
+      Logger.logInfo('Falha ao adicionar o rating.');
+    }
+
+    final docSnapshot = await _companiesCollection.doc(companyId).get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
+      Logger.logInfo('Ratings atuais: ${data['ratings']}');
+    }
+  }
 }

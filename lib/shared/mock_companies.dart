@@ -44,6 +44,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '90%',
       'Crescimento Anual': '15%',
     },
+    ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'Green Earth GS',
@@ -79,6 +80,7 @@ final List<CompanyModel> mockCompanies = [
       'Impacto Ambiental': 'Redução de 25% nas emissões',
       'Crescimento Anual': '20%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'HealthFirst SP',
@@ -113,6 +115,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '85%',
       'Crescimento Anual': '10%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'EduLearn GS',
@@ -148,6 +151,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '92%',
       'Crescimento Anual': '18%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'AutoDrive SP',
@@ -182,6 +186,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '88%',
       'Crescimento Anual': '12%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'Foodies Hub SP',
@@ -217,6 +222,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '91%',
       'Crescimento Anual': '14%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'FitLife Gym SP',
@@ -251,6 +257,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '89%',
       'Crescimento Anual': '16%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'TravelSphere SP',
@@ -285,6 +292,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '87%',
       'Crescimento Anual': '13%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'EcoClean Services GS',
@@ -320,6 +328,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '95%',
       'Crescimento Anual': '22%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'Artistic Minds SP',
@@ -356,6 +365,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '80%',
       'Crescimento Anual': '9%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'SmartHome Solutions SP',
@@ -392,6 +402,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '93%',
       'Crescimento Anual': '19%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'FashionHub SP',
@@ -426,6 +437,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '84%',
       'Crescimento Anual': '11%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'ByteWorks SP',
@@ -460,6 +472,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '89%',
       'Crescimento Anual': '17%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'Garden Bliss SP',
@@ -494,6 +507,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '85%',
       'Crescimento Anual': '10%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'SecureNet SP',
@@ -529,6 +543,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '97%',
       'Crescimento Anual': '25%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'BrightLights SP',
@@ -564,6 +579,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '82%',
       'Crescimento Anual': '8%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'PetCare Plus SP',
@@ -598,6 +614,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '90%',
       'Crescimento Anual': '14%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'BrightFuture Education SP',
@@ -635,6 +652,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '98%',
       'Crescimento Anual': '30%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'UrbanDesign Co. SP',
@@ -670,6 +688,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '80%',
       'Crescimento Anual': '10%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'MediCare Health SP',
@@ -705,6 +724,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '94%',
       'Crescimento Anual': '21%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'BrightSkies Airlines SP',
@@ -740,6 +760,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '89%',
       'Crescimento Anual': '15%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'BrightIdeas Consulting SP',
@@ -776,6 +797,7 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '90%',
       'Crescimento Anual': '18%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
   CompanyModel(
     name: 'SmartTech Innovations SP',
@@ -811,5 +833,6 @@ final List<CompanyModel> mockCompanies = [
       'Satisfação do Cliente': '86%',
       'Crescimento Anual': '13%',
     },
+     ratings: [4.5, 4.0, 5.0, 3.5, 4.8],
   ),
 ];

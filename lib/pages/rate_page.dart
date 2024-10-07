@@ -43,11 +43,6 @@ class _RatePageState extends State<RatePage> {
         ),
         title: Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(widget.company.imageUrl ?? ''),
-              radius: 25,
-            ),
-            const SizedBox(width: 14),
             Text(
               'Avaliar ${widget.company.name}',
               style:
@@ -61,15 +56,9 @@ class _RatePageState extends State<RatePage> {
         children: [
           const SizedBox(height: 10),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(10),
             child: const Row(
               children: [
-                Image(
-                  image: AssetImage('assets/images/placeholder-user.png'),
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                ),
                 SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,17 +104,36 @@ class _RatePageState extends State<RatePage> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'Conte como foi sua experiência neste lugar',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+          const SizedBox(height: 16.0),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    hintText: 'Deixe seu título',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 16.0), // Espaço entre os campos
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Conte como foi sua experiência neste lugar',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),

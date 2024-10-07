@@ -1,11 +1,8 @@
 class CompanyModel {
-  // Campos originais (não alterados)
   String name;
   double latitude;
   double longitude;
-  String address; // Alterado de 'endereco' para 'address'
-
-  // Campos adicionados (novidades) - agora são nullable
+  String address;
   String? imageUrl;
   double? rating;
   String? phoneNumber;
@@ -13,6 +10,7 @@ class CompanyModel {
   Map<String, List<Map<String, dynamic>>>? accessibilityData;
   List<Map<String, dynamic>>? commentsData;
   Map<String, dynamic>? performanceData;
+  List<double>? ratings;
   String? cnpj;
   String? registrationDate;
   String? about;
@@ -29,6 +27,7 @@ class CompanyModel {
     this.accessibilityData,
     this.commentsData,
     this.performanceData,
+    this.ratings,
     this.cnpj,
     this.registrationDate,
     this.about,
@@ -61,6 +60,10 @@ class CompanyModel {
         performanceData: json['performanceData'] != null
             ? Map<String, dynamic>.from(json['performanceData'])
             : null,
+        ratings: json['ratings'] != null
+            ? List<double>.from((json['ratings'] as List)
+                .map((item) => (item as num).toDouble()))
+            : [], 
         cnpj: json['cnpj'],
         registrationDate: json['registrationDate'],
         about: json['about'],
@@ -79,6 +82,7 @@ class CompanyModel {
         'accessibilityData': accessibilityData,
         'commentsData': commentsData,
         'performanceData': performanceData,
+        'ratings': ratings,
         'cnpj': cnpj,
         'registrationDate': registrationDate,
         'about': about,
