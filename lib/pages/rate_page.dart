@@ -16,13 +16,28 @@ class RatePage extends StatefulWidget {
 }
 
 class _RatePageState extends State<RatePage> {
-  TextEditingController _comment = TextEditingController();
-  CompanyController _company = CompanyController();
+ final TextEditingController _comment = TextEditingController();
+ final CompanyController _company = CompanyController();
+  double _rating = 0;
 
-  addComment() async {
-    await _company.addUserComment(widget.company.name, _comment.text);
+  // Função para adicionar comentário e avaliação
+  addCommentAndRating() async {
+    bool result =
+        await _company.addUserComment(widget.company.uuid, _comment.text);
+    bool ratingResult =
+        await _company.addCompanyUserRating(widget.company.uuid, _rating);
+
+    if (result && ratingResult) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Avaliação enviada com sucesso!')),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao enviar avaliação.')),
+      );
+    }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +112,7 @@ class _RatePageState extends State<RatePage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: RatingBar.builder(
-              initialRating: 3,
+              initialRating: _rating,
               minRating: 1,
               direction: Axis.horizontal,
               allowHalfRating: true,
@@ -107,9 +122,9 @@ class _RatePageState extends State<RatePage> {
                 color: Colors.amber,
               ),
               onRatingUpdate: (rating) {
-                if (kDebugMode) {
-                  print(rating);
-                }
+                setState(() {
+                  _rating = rating; // Atualizar o rating
+                });
               },
             ),
           ),
@@ -142,7 +157,7 @@ class _RatePageState extends State<RatePage> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                addComment();
+                addCommentAndRating();
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 48),

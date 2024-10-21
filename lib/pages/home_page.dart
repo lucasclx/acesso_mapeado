@@ -49,26 +49,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-// Função que adciona o rating do usuário
-  Future<void> _addUserRating() async {
-    try {
-      await _companyController.addUserRating();
-      Logger.logInfo("Rating adicionado com sucesso.");
-
-      companies = await _companyController.getAllCompanies();
-
-      if (!mounted) return;
-
-      setState(() {});
-    } catch (e) {
-      Logger.logError('Erro ao adicionar rating: $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao adicionar rating.')),
-      );
-    }
-  }
-
   // Função para inserir dados de mock
   Future<void> _insertMockData() async {
     try {
@@ -307,11 +287,6 @@ class _HomePageState extends State<HomePage> {
           icon: const Icon(Icons.add, color: Colors.green),
           tooltip: 'Inserir Dados de Mock',
           onPressed: _insertMockData,
-        ),
-        IconButton(
-          icon: const Icon(Icons.add, color: Colors.black54),
-          tooltip: 'Inserir rating do usuário',
-          onPressed: _addUserRating,
         ),
         IconButton(
           icon: const Icon(Icons.delete, color: Colors.red),

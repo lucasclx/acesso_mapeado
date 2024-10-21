@@ -71,6 +71,7 @@ class CompanyController {
     }
   }
 
+  // Função que cria a empresa
   Future<bool> createCompany(CompanyModel company) async {
     try {
       final docRef = await FirebaseFirestore.instance
@@ -84,17 +85,19 @@ class CompanyController {
     }
   }
 
-  // Função para editar a empresa e atualizar o rating baseado na média dos ratings
-  Future<bool> updateCompanyRating(String companyId) async {
+  // Função para editar a empresa atualizando o rating baseado na média dos ratings
+  Future<bool> updateCompanyRating(String companyUUID) async {
     try {
-      // Obter o documento da empresa
-      final docSnapshot = await _companiesCollection.doc(companyId).get();
+      QuerySnapshot querySnapshot = await _companiesCollection
+          .where('uuid', isEqualTo: companyUUID)
+          .get();
 
-      if (!docSnapshot.exists) {
-        Logger.logInfo('Empresa não encontrada.');
+      if (querySnapshot.docs.isEmpty) {
+        Logger.logInfo('Empresa com UUID não encontrada.');
         return false;
       }
 
+      DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       CompanyModel company = CompanyModel.fromJson(
         docSnapshot.data() as Map<String, dynamic>,
       );
@@ -106,7 +109,7 @@ class CompanyController {
       double averageRating =
           company.ratings!.reduce((a, b) => a + b) / company.ratings!.length;
 
-      await _companiesCollection.doc(companyId).update({
+      await docSnapshot.reference.update({
         'rating': averageRating,
       });
 
@@ -119,26 +122,30 @@ class CompanyController {
   }
 
   // Função para adicionar o rating de um usuário à empresa
-  Future<bool> addCompanyUserRating(String companyId, double userRating) async {
+  Future<bool> addCompanyUserRating(
+      String companyUUID, double userRating) async {
     try {
-      final docSnapshot = await _companiesCollection.doc(companyId).get();
+      QuerySnapshot querySnapshot = await _companiesCollection
+          .where('uuid', isEqualTo: companyUUID)
+          .get();
 
-      if (!docSnapshot.exists) {
-        Logger.logInfo('Empresa não encontrada.');
+      if (querySnapshot.docs.isEmpty) {
+        Logger.logInfo('Empresa com UUID não encontrada.');
         return false;
       }
 
+      DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
 
       List<double> ratings = List<double>.from(data['ratings'] ?? []);
 
       ratings.add(userRating);
 
-      await _companiesCollection.doc(companyId).update({
+      await docSnapshot.reference.update({
         'ratings': ratings,
       });
 
-      await updateCompanyRating(companyId);
+      await updateCompanyRating(companyUUID);
 
       Logger.logInfo('Rating do usuário adicionado com sucesso.');
       return true;
@@ -149,11 +156,8 @@ class CompanyController {
   }
 
   // Função para adição de um rating
-  Future<void> addUserRating() async {
-    String companyId = '2mzbcytEWZyhpFihwKTk';
-    double userRating = 0;
-
-    bool result = await addCompanyUserRating(companyId, userRating);
+  Future<void> addUserRating(String companyUUID, double userRating) async {
+    bool result = await addCompanyUserRating(companyUUID, userRating);
 
     if (result) {
       Logger.logInfo('Rating adicionado com sucesso.');
@@ -161,25 +165,26 @@ class CompanyController {
       Logger.logInfo('Falha ao adicionar o rating.');
     }
 
-    final docSnapshot = await _companiesCollection.doc(companyId).get();
+    final docSnapshot = await _companiesCollection.doc(companyUUID).get();
     if (docSnapshot.exists) {
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
       Logger.logInfo('Ratings atuais: ${data['ratings']}');
     }
   }
 
-  // Função para adicionar comentario do usuario na empresa
-  Future<bool> addUserComment(String companyId, String comment) async {
-    String companyId = '2mzbcytEWZyhpFihwKTk';
-
+  // Função que adiciona o comentário do usuario à empresa
+  Future<bool> addUserComment(String companyUUID, String comment) async {
     try {
-      final docSnapshot = await _companiesCollection.doc(companyId).get();
+      QuerySnapshot querySnapshot = await _companiesCollection
+          .where('uuid', isEqualTo: companyUUID)
+          .get();
 
-      if (!docSnapshot.exists) {
-        Logger.logInfo('Empresa não encontrada.');
+      if (querySnapshot.docs.isEmpty) {
+        Logger.logInfo('Empresa com UUID não encontrada.');
         return false;
       }
 
+      DocumentSnapshot docSnapshot = querySnapshot.docs.first;
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
 
       List<Map<String, dynamic>> commentsData =
@@ -194,7 +199,7 @@ class CompanyController {
 
       commentsData.add(commentData);
 
-      await _companiesCollection.doc(companyId).update({
+      await docSnapshot.reference.update({
         'commentsData': commentsData,
       });
 
