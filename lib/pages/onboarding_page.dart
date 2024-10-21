@@ -1,4 +1,5 @@
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
+import 'package:acesso_mapeado/pages/sign_up_company_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
@@ -111,7 +112,12 @@ class OnboardingPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SignUpCompanyPage()));
+                    },
                     child: const Text(
                       'Sou uma empresa',
                       style: TextStyle(
