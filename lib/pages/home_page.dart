@@ -1,6 +1,5 @@
 // pages/home_page.dart
 import 'dart:async';
-import 'package:acesso_mapeado/models/company_state.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

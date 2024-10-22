@@ -2,13 +2,13 @@ import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
-import 'package:flutter/foundation.dart';
+import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
 
 class RatePage extends StatefulWidget {
   const RatePage({super.key, required this.company});
-
   final CompanyModel company;
 
   @override
@@ -16,9 +16,10 @@ class RatePage extends StatefulWidget {
 }
 
 class _RatePageState extends State<RatePage> {
- final TextEditingController _comment = TextEditingController();
- final CompanyController _company = CompanyController();
+  final TextEditingController _comment = TextEditingController();
+  final CompanyController _company = CompanyController();
   double _rating = 0;
+  List<CompanyModel> companies = [];
 
   // Função para adicionar comentário e avaliação
   addCommentAndRating() async {
@@ -26,15 +27,47 @@ class _RatePageState extends State<RatePage> {
         await _company.addUserComment(widget.company.uuid, _comment.text);
     bool ratingResult =
         await _company.addCompanyUserRating(widget.company.uuid, _rating);
+    await getCompanies();
+
+    if (!mounted) return;
 
     if (result && ratingResult) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Avaliação enviada com sucesso!')),
+        const SnackBar(
+          content: Text('Avaliação enviada com sucesso!'),
+          duration: Duration(seconds: 1),
+        ),
       );
-      Navigator.pop(context);
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao enviar avaliação.')),
+      );
+    }
+  }
+
+  Future<void> getCompanies() async {
+    try {
+      companies = await _company.getAllCompanies();
+      Logger.logInfo("Empresas carregadas: ${companies.length}");
+
+      if (!mounted) return;
+      Provider.of<CompanyState>(context, listen: false)
+          .updateCompanies(companies);
+      setState(() {});
+    } catch (e) {
+      Logger.logError('Erro ao carregar empresas: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erro ao carregar empresas.')),
       );
     }
   }

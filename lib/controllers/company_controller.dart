@@ -1,7 +1,20 @@
+import 'package:acesso_mapeado/models/company_model.dart';
+import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/mock_companies.dart';
+
+// CompanyState gerencia o estado das empresas e notifica os widgets
+class CompanyState extends ChangeNotifier {
+  List<CompanyModel> _companies = [];
+
+  List<CompanyModel> get companies => _companies;
+
+  void updateCompanies(List<CompanyModel> newCompanies) {
+    _companies = newCompanies;
+    notifyListeners(); // Notifica as mudanças para os widgets
+  }
+}
 
 class CompanyController {
   final CollectionReference _companiesCollection =
@@ -10,8 +23,7 @@ class CompanyController {
   // Função para obter todas as empresas
   Future<List<CompanyModel>> getAllCompanies() async {
     try {
-      final response =
-          await FirebaseFirestore.instance.collection('companies').get();
+      final response = await FirebaseFirestore.instance.collection('companies').get();
 
       List<CompanyModel> companies = response.docs
           .map((doc) => CompanyModel.fromJson(doc.data()))
@@ -32,8 +44,7 @@ class CompanyController {
           .get();
 
       List<CompanyModel> companies = querySnapshot.docs
-          .map((doc) =>
-              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       return companies;
     } catch (e) {
@@ -57,12 +68,10 @@ class CompanyController {
   // Função para obter todas as empresas ordenadas por rating decrescente
   Future<List<CompanyModel>> getAllCompaniesOrderByRating() async {
     try {
-      final response =
-          await _companiesCollection.orderBy('rating', descending: true).get();
+      final response = await _companiesCollection.orderBy('rating', descending: true).get();
 
       List<CompanyModel> companies = response.docs
-          .map((doc) =>
-              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       return companies;
     } catch (e) {
