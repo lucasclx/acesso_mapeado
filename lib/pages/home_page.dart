@@ -12,6 +12,7 @@ import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:acesso_mapeado/widgets/accessibility_sheet.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,7 +39,8 @@ class _HomePageState extends State<HomePage> {
       Logger.logInfo("Empresas carregadas: ${companies.length}");
 
       if (!mounted) return;
-
+      Provider.of<CompanyState>(context, listen: false)
+          .updateCompanies(companies);
       setState(() {});
     } catch (e) {
       Logger.logError('Erro ao carregar empresas: $e');
@@ -131,7 +133,9 @@ class _HomePageState extends State<HomePage> {
   ];
 
   // Métodos para construir cada página
-  Widget _buildHomePage() {
+  Widget _buildHomePage(CompanyState companyState) {
+    List<CompanyModel> companies = companyState.companies;
+
     return ListView.builder(
       itemCount: companies.length,
       itemBuilder: (context, index) {
@@ -194,13 +198,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final companyState = Provider.of<CompanyState>(context);
     return Scaffold(
       appBar: homeAppBar(),
       backgroundColor: AppColors.white,
       body: IndexedStack(
         index: _selectedIndex,
         children: [
-          _buildHomePage(),
+          _buildHomePage(companyState),
           const Text('Bate-papo'),
           _buildRankingPage(),
           const ProfileUserPage(),
