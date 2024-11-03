@@ -1,18 +1,84 @@
-// widgets/accessibility_sheet.dart
+import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'info_tile.dart';
 import 'custom_button.dart';
 import 'comment_widget.dart';
 import 'accessibility_section.dart';
 import 'package:acesso_mapeado/pages/rate_page.dart';
 
-class AccessibilitySheet extends StatelessWidget {
+class AccessibilitySheet extends StatefulWidget {
   final CompanyModel companyModel;
 
   const AccessibilitySheet({super.key, required this.companyModel});
+
+  @override
+  State<AccessibilitySheet> createState() => _AccessibilitySheetState();
+}
+
+class _AccessibilitySheetState extends State<AccessibilitySheet> {
+  bool isMapExpanded = false;
+  double mapHeight = 200;
+
+  void toggleMapHeight() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(widget.companyModel.address),
+          ),
+          body: Stack(
+            children: [
+              GoogleMap(
+                markers: <Marker>{
+                  Marker(
+                    markerId: MarkerId(widget.companyModel.name),
+                    position: LatLng(
+                      widget.companyModel.latitude,
+                      widget.companyModel.longitude,
+                    ),
+                  ),
+                },
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(
+                    widget.companyModel.latitude,
+                    widget.companyModel.longitude,
+                  ),
+                  zoom: 15,
+                ),
+                zoomGesturesEnabled: false,
+                scrollGesturesEnabled: false,
+                rotateGesturesEnabled: false,
+                tiltGesturesEnabled: false,
+                myLocationButtonEnabled: false,
+                compassEnabled: false,
+                zoomControlsEnabled: false,
+              ),
+              //button to open googlemaps on directions api
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: CustomButton(
+                  label: 'Como chegar',
+                  icon: Icons.directions,
+                  onPressed: () async {
+                    final Uri uri = Uri.parse(
+                        'https://www.google.com/maps/dir/?api=1&destination=${widget.companyModel.latitude},${widget.companyModel.longitude}');
+                    await launchUrl(uri);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +91,7 @@ class AccessibilitySheet extends StatelessWidget {
           decoration: const BoxDecoration(
             color: AppColors.white,
             borderRadius: BorderRadius.vertical(
-              top: Radius.circular(20.0),
+              top: Radius.circular(AppSpacing.extraMedium),
             ),
           ),
           child: ListView(
@@ -52,7 +118,7 @@ class AccessibilitySheet extends StatelessWidget {
                     // Nome da Empresa
                     Expanded(
                       child: Text(
-                        companyModel.name,
+                        widget.companyModel.name,
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -64,9 +130,10 @@ class AccessibilitySheet extends StatelessWidget {
                     Column(
                       children: [
                         Text(
-                          companyModel.rating?.toStringAsFixed(1) ?? '0.0',
+                          widget.companyModel.rating?.toStringAsFixed(1) ??
+                              '0.0',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: AppSpacing.medium,
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
                           ),
@@ -75,12 +142,20 @@ class AccessibilitySheet extends StatelessWidget {
                           children: List.generate(5, (index) {
                             return Icon(
                               Icons.star,
-                              color: index < (companyModel.rating?.floor() ?? 0)
+                              color: index <
+                                      (widget.companyModel.rating?.floor() ?? 0)
                                   ? Colors.yellow
                                   : Colors.grey,
                               size: 20,
                             );
                           }),
+                        ),
+                        Text(
+                          '(${widget.companyModel.ratings?.length ?? 0})',
+                          style: const TextStyle(
+                            fontSize: AppSpacing.small,
+                            color: AppColors.lightGray,
+                          ),
                         ),
                       ],
                     ),
@@ -92,18 +167,25 @@ class AccessibilitySheet extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Center(
-                  child: companyModel.imageUrl != null &&
-                          companyModel.imageUrl!.isNotEmpty
-                      ? Image.network(
-                          companyModel.imageUrl!,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'assets/images/img-company.png',
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
+                  child: Image(
+                    image: NetworkImage(widget.companyModel.imageUrl!),
+                    height: 150,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      return Image.asset(
+                        'assets/images/img-company.png',
+                        height: 150,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/images/img-company.png',
+                        height: 150,
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 10.0),
@@ -122,21 +204,8 @@ class AccessibilitySheet extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => RatePage(
-                              company: companyModel,
+                              company: widget.companyModel,
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    CustomButton(
-                      icon: Icons.message_outlined,
-                      label: 'Chat',
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                                'Funcionalidade de chat em desenvolvimento!'),
                           ),
                         );
                       },
@@ -145,53 +214,86 @@ class AccessibilitySheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10.0),
-              // Endereço
-              InfoTile(
-                icon: Icons.location_on,
-                text: companyModel.address,
+              InkWell(
+                onTap: () async {
+                  Logger.logInfo('Abrindo Google Maps');
+                  final Uri uri = Uri.parse(
+                      'https://www.google.com/maps/search/?api=1&query=${widget.companyModel.address}');
+
+                  Logger.logInfo('Abrindo Google Maps: $uri');
+                  await launchUrl(uri);
+                },
+                child: InfoTile(
+                  icon: Icons.location_on,
+                  text: widget.companyModel.address,
+                ),
               ),
               const SizedBox(height: 10.0),
               // Mapa da Localização
-              SizedBox(
-                width: double.infinity,
-                height: 200,
-                child: GoogleMap(
-                  markers: <Marker>{
-                    Marker(
-                      markerId: MarkerId(companyModel.name),
-                      position:
-                          LatLng(companyModel.latitude, companyModel.longitude),
-                      infoWindow: InfoWindow(
-                        title: companyModel.name,
-                        snippet: companyModel.address,
+              Stack(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    height: mapHeight,
+                    child: GoogleMap(
+                      markers: <Marker>{
+                        Marker(
+                          markerId: MarkerId(widget.companyModel.name),
+                          position: LatLng(widget.companyModel.latitude,
+                              widget.companyModel.longitude),
+                          infoWindow: InfoWindow(
+                            title: widget.companyModel.name,
+                            snippet: widget.companyModel.address,
+                          ),
+                        ),
+                      },
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(widget.companyModel.latitude,
+                            widget.companyModel.longitude),
+                        zoom: 15,
                       ),
+                      zoomGesturesEnabled: false,
+                      scrollGesturesEnabled: false,
+                      rotateGesturesEnabled: false,
+                      tiltGesturesEnabled: false,
+                      myLocationButtonEnabled: false,
+                      compassEnabled: false,
+                      zoomControlsEnabled: false,
                     ),
-                  },
-                  initialCameraPosition: CameraPosition(
-                    target:
-                        LatLng(companyModel.latitude, companyModel.longitude),
-                    zoom: 15,
                   ),
-                  zoomGesturesEnabled: false,
-                  scrollGesturesEnabled: false,
-                  rotateGesturesEnabled: false,
-                  tiltGesturesEnabled: false,
-                  myLocationButtonEnabled: false,
-                  compassEnabled: false,
-                ),
+                  Container(
+                    height: mapHeight,
+                    width: MediaQuery.of(context).size.width,
+                    child: GestureDetector(
+                      onTap: toggleMapHeight,
+                      child: const Text(''),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: AppSpacing.extraMedium),
               // Telefone e Horário de Funcionamento
-              InfoTile(
-                icon: Icons.phone,
-                text: companyModel.phoneNumber ?? 'Telefone não disponível',
+              InkWell(
+                onTap: () async {
+                  if (widget.companyModel.phoneNumber != null &&
+                      widget.companyModel.phoneNumber!.isNotEmpty) {
+                    final Uri uri =
+                        Uri.parse('tel:${widget.companyModel.phoneNumber}');
+                    await launchUrl(uri);
+                  }
+                },
+                child: InfoTile(
+                  icon: Icons.phone,
+                  text: widget.companyModel.phoneNumber ??
+                      'Telefone não disponível',
+                ),
               ),
               InfoTile(
                 icon: Icons.access_time,
-                text: companyModel.workingHours ??
+                text: widget.companyModel.workingHours ??
                     'Horário de funcionamento não disponível',
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: AppSpacing.extraMedium),
               // Seção de Acessibilidade
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -205,26 +307,27 @@ class AccessibilitySheet extends StatelessWidget {
                 ),
               ),
               // Acessibilidade
-              if (companyModel.accessibilityData != null &&
-                  companyModel.accessibilityData!.isNotEmpty)
+              if (widget.companyModel.accessibilityData != null &&
+                  widget.companyModel.accessibilityData!.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
                   physics: // Desabilita o scroll interno
                       const NeverScrollableScrollPhysics(),
                   controller: scrollController,
-                  itemCount: companyModel.accessibilityData!.length,
+                  itemCount: widget.companyModel.accessibilityData!.length,
                   itemBuilder: (context, index) {
-                    String category =
-                        companyModel.accessibilityData!.keys.elementAt(index);
+                    String category = widget
+                        .companyModel.accessibilityData!.keys
+                        .elementAt(index);
                     List<Map<String, dynamic>> items =
-                        companyModel.accessibilityData![category]!;
+                        widget.companyModel.accessibilityData![category]!;
                     return AccessibilitySection(
                       category: category,
                       items: items,
                     );
                   },
                 ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: AppSpacing.extraMedium),
               // Seção de Comentários
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -237,30 +340,28 @@ class AccessibilitySheet extends StatelessWidget {
                   ),
                 ),
               ),
-              if (companyModel.commentsData != null &&
-                  companyModel.commentsData!.isNotEmpty)
+              if (widget.companyModel.commentsData != null &&
+                  widget.companyModel.commentsData!.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
                   physics: // Desabilita o scroll interno
                       const NeverScrollableScrollPhysics(),
                   controller: scrollController,
-                  itemCount: companyModel.commentsData!.length,
+                  itemCount: widget.companyModel.commentsData!.length,
                   itemBuilder: (context, index) {
-                    var comment = companyModel.commentsData![index];
+                    var comment = widget.companyModel.commentsData![index];
+                    if (comment["text"] == null || comment["text"]!.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
                     return CommentWidget(
-                      title: comment["title"] ?? 'Título não disponível',
-                      userName: comment["userName"] ??
-                          'Nome do usuário não disponível',
-                      userImage: comment["userImage"] != null &&
-                              comment["userImage"]!.isNotEmpty
-                          ? comment["userImage"]!
-                          : 'assets/images/placeholder-user.png',
-                      text: comment["text"] ?? 'Comentário não disponível',
-                      date: comment["date"] ?? 'Data não disponível',
+                      userName: comment["userName"],
+                      userImage: comment["userImage"],
+                      text: comment["text"],
+                      date: comment["date"],
                     );
                   },
                 ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: AppSpacing.extraMedium),
               // Seção de Desempenho da Empresa
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -273,38 +374,49 @@ class AccessibilitySheet extends StatelessWidget {
                   ),
                 ),
               ),
-              if (companyModel.performanceData != null &&
-                  companyModel.performanceData!.isNotEmpty)
-                ListView.builder(
-                  shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
-                  physics: // Desabilita o scroll interno
-                      const NeverScrollableScrollPhysics(),
-                  controller: scrollController,
-                  itemCount: companyModel.performanceData!.length,
-                  itemBuilder: (context, index) {
-                    var entry =
-                        companyModel.performanceData!.entries.elementAt(index);
-                    return ListTile(
-                      leading: Icon(
-                        switch (entry.key) {
-                          'Acessibilidade' => Icons.accessibility,
-                          'Atendimento' => Icons.headset_mic,
-                          'Estrutura' => Icons.home,
-                          'Limpeza' => Icons.cleaning_services,
-                          'Qualidade' => Icons.star,
-                          'Segurança' => Icons.security,
-                          'Crescimento Anual' => Icons.trending_up,
-                          'Impacto Ambiental' => Icons.eco,
-                          _ => Icons.help_outline,
-                        },
-                        color: AppColors.lightPurple,
-                      ),
-                      title: Text(entry.key),
-                      subtitle: Text(entry.value.toString()),
-                    );
-                  },
-                ),
-              const SizedBox(height: 20.0),
+              //faça uma lista de 5 linhas onde cada linha será uma nota de 1 a 5, onde cada nota terá a quantidade de avaliacoes correspondentes
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  final rating = 5 - index;
+                  final count = widget.companyModel.ratings
+                          ?.where((r) => r.round() == rating)
+                          .length ??
+                      0;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 4.0),
+                    child: Row(
+                      children: [
+                        Text('$rating ',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.black)),
+                        const Text('★',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.yellow)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: LinearProgressIndicator(
+                            value: count /
+                                (widget.companyModel.ratings?.length ?? 1),
+                            backgroundColor: AppColors.lightGray,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppColors.lightPurple),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('$count',
+                            style: const TextStyle(color: AppColors.darkGray)),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
               // Seção Sobre a Empresa
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -330,14 +442,15 @@ class AccessibilitySheet extends StatelessWidget {
                           const TextSpan(
                             text: 'CNPJ: ',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: AppSpacing.medium,
                               color: AppColors.lightPurple,
                             ),
                           ),
                           TextSpan(
-                            text: companyModel.cnpj ?? 'CNPJ não disponível',
+                            text: widget.companyModel.cnpj ??
+                                'CNPJ não disponível',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: AppSpacing.medium,
                               color: AppColors.black,
                             ),
                           ),
@@ -352,15 +465,19 @@ class AccessibilitySheet extends StatelessWidget {
                           const TextSpan(
                             text: 'Data de Cadastro: ',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: AppSpacing.medium,
                               color: AppColors.lightPurple,
                             ),
                           ),
                           TextSpan(
-                            text: companyModel.registrationDate ??
-                                'Data de cadastro não disponível',
+                            text: widget.companyModel.registrationDate != null
+                                ? formatDate(
+                                    DateTime.parse(
+                                        widget.companyModel.registrationDate!),
+                                    [dd, '/', mm, '/', yyyy])
+                                : 'Data de cadastro não disponível',
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: AppSpacing.medium,
                               color: AppColors.black,
                             ),
                           ),
@@ -369,18 +486,31 @@ class AccessibilitySheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 8.0),
                     // Descrição Sobre a Empresa
-                    Text(
-                      companyModel.about ??
-                          'Informações sobre a empresa não disponíveis.',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: AppColors.black,
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Descrição: ',
+                            style: TextStyle(
+                              fontSize: AppSpacing.medium,
+                              color: AppColors.lightPurple,
+                            ),
+                          ),
+                          TextSpan(
+                            text: widget.companyModel.about ??
+                                'Descrição não disponível',
+                            style: const TextStyle(
+                              fontSize: AppSpacing.medium,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: AppSpacing.extraMedium),
             ],
           ),
         );

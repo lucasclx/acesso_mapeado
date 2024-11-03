@@ -25,17 +25,26 @@ class AppColors {
   /// um vermelho brilhante usado para indicadores de erro ou alertas.
   /// Este é o único tom de vermelho disponível.
   static const Color red = Color(0xFFE53935);
+
+  /// Um amarelo claro usado para destaques ou ícones.
+  static const Color yellow = Color(0xFFFDD835);
 }
 
 /// Uma classe que define os valores de espaçamento do aplicativo.
 class AppSpacing {
   AppSpacing._(); // Impede a instanciação da classe
 
+  /// Valor de espaçamento extra pequeno usado para elementos muito compactos como padding ou margens.
+  static const double extraSmall = 4.0;
+
   /// Valor de espaçamento pequeno usado para elementos compactos como padding ou margens.
   static const double small = 8.0;
 
   /// Valor de espaçamento médio usado para padding ou margens padrão.
   static const double medium = 16.0;
+
+  /// Valor de espaçamento extra médio usado para seções ou separações maiores.
+  static const double extraMedium = 20.0;
 
   /// Valor de espaçamento grande usado para seções ou separações maiores.
   static const double large = 24.0;

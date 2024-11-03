@@ -29,11 +29,6 @@ class _AppNavbarState extends State<AppNavbar> {
         ),
         BottomNavigationBarItem(
           backgroundColor: AppColors.white,
-          icon: Icon(Icons.chat_outlined),
-          label: 'Bate-Papo',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: AppColors.white,
           icon: Icon(Icons.bar_chart_outlined),
           label: 'Ranking',
         ),

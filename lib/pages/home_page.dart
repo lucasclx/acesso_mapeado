@@ -1,4 +1,3 @@
-// pages/home_page.dart
 import 'dart:async';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
@@ -127,7 +126,6 @@ class _HomePageState extends State<HomePage> {
 
   final indexTitle = [
     'Empresas',
-    'Bate-papo',
     'Ranking',
     'Perfil',
   ];
@@ -206,7 +204,6 @@ class _HomePageState extends State<HomePage> {
         index: _selectedIndex,
         children: [
           _buildHomePage(companyState),
-          const Text('Bate-papo'),
           _buildRankingPage(),
           const ProfileUserPage(),
         ],

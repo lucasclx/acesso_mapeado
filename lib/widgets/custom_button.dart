@@ -17,6 +17,7 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        color: AppColors.white,
         border: Border.all(color: AppColors.lightPurple),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -31,3 +32,4 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+
