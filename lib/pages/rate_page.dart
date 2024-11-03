@@ -21,8 +21,22 @@ class _RatePageState extends State<RatePage> {
   double _rating = 0;
   List<CompanyModel> companies = [];
 
+  bool sending = false;
+
   // Função para adicionar comentário e avaliação
   addCommentAndRating() async {
+    if (sending) return;
+
+    if (_rating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Avaliação não pode ser 0.')),
+      );
+      return;
+    }
+    setState(() {
+      sending = true;
+    });
+
     bool result =
         await _company.addUserComment(widget.company.uuid, _comment.text);
     bool ratingResult =
@@ -42,12 +56,18 @@ class _RatePageState extends State<RatePage> {
       await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
+        setState(() {
+          sending = false;
+        });
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
         );
       }
     } else {
+      setState(() {
+        sending = false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao enviar avaliação.')),
       );
@@ -92,10 +112,7 @@ class _RatePageState extends State<RatePage> {
         leading: IconButton(
           icon: Image.asset('assets/icons/arrow-left.png'),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-            );
+            Navigator.pop(context);
           },
         ),
         title: Row(

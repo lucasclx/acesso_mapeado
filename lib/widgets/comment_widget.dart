@@ -1,20 +1,21 @@
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 
 class CommentWidget extends StatelessWidget {
-  final String title;
-  final String userName;
-  final String userImage;
-  final String text;
-  final String date;
+  final String? userName;
+  final String? userImage;
+  final String? text;
+  final String? date;
+  final int? ratingsCount;
 
   const CommentWidget({
     super.key,
-    required this.title,
-    required this.userName,
-    required this.userImage,
-    required this.text,
-    required this.date,
+    this.userName,
+    this.userImage,
+    this.text,
+    this.date,
+    this.ratingsCount,
   });
 
   @override
@@ -24,20 +25,12 @@ class CommentWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: AppColors.black,
-            ),
-          ),
-          const SizedBox(height: 8.0),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage(userImage),
+                backgroundImage: AssetImage(
+                    userImage ?? 'assets/images/placeholder-user.png'),
                 radius: 20.0,
               ),
               const SizedBox(width: 10.0),
@@ -45,17 +38,33 @@ class CommentWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          userName ?? 'Nome do usuário não disponível',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.black,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.extraSmall),
+                        Row(
+                          children: List.generate(5, (index) {
+                            return Icon(
+                              Icons.star,
+                              color: index < (ratingsCount ?? 0)
+                                  ? Colors.yellow
+                                  : Colors.grey,
+                              size: 20,
+                            );
+                          }),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4.0),
                     Text(
-                      text,
+                      text ?? 'Comentário não disponível',
                       style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.darkGray,
@@ -63,7 +72,12 @@ class CommentWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4.0),
                     Text(
-                      date,
+                      date != null
+                          ? formatDate(
+                              DateTime.parse(date!),
+                              [hh, ':', nn, ' ', dd, '/', mm, '/', yyyy],
+                            )
+                          : 'Data não disponível',
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.lightGray,
