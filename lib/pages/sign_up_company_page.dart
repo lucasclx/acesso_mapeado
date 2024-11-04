@@ -272,7 +272,30 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
           keyboardType: TextInputType.text,
         ),
         const SizedBox(height: 20),
+        _buildAboutCompany(),
+        const SizedBox(height: 20),
         _buildWorkingHours(),
+      ],
+    );
+  }
+
+  Widget _buildAboutCompany() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Sobre a empresa',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 150, // Ajuste a altura conforme necessário
+          child: TextField(
+            maxLines: 10, // Permite até 10 linhas, ajuste como quiser
+            decoration: const InputDecoration(
+              hintText: 'Escreva sobre a empresa...',
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -440,6 +463,14 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
         TextFormField(
           decoration: InputDecoration(
               labelText: 'Cidade',
+              border: OutlineInputBorder(),
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0)),
+        ),
+        SizedBox(height: 20),
+        TextFormField(
+          decoration: InputDecoration(
+              labelText: 'Estado',
               border: OutlineInputBorder(),
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0)),
