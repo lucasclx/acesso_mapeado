@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
   get email => null;
 
   Future<User?> signIn(String email, String password) async {
@@ -21,7 +21,7 @@ class AuthController {
     await _auth.signOut();
   }
 
-  isValidEmail(){
+  isValidEmail() {
     return email.contains('@') && email.contains('.');
   }
 }
