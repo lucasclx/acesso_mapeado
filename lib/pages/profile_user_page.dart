@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,6 +17,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   // final ImagePicker _picker = ImagePicker();
   final imagePicker = ImagePicker();
+  final authController = AuthController();
 
   // Future<void> _pickImage() async {
   //   final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -78,7 +80,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                                 color: AppColors.lightPurple,
                                 size: 23,
                               ),
-                              // onPressed: _pickImage, // Selecionar imagem
                             ),
                           ),
                         ),
@@ -197,7 +198,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                           color: AppColors.lightPurple),
                       const SizedBox(width: 8),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          authController.signOut();
+                          Navigator.pop(context);
+                        },
                         child: const Text(
                           'Sair',
                           style: TextStyle(
