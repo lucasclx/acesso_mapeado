@@ -3,6 +3,7 @@ import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatefulWidget {
@@ -31,7 +32,6 @@ class _SignInPageState extends State<SignInPage> {
         );
       }
     } on Exception catch (e) {
-      // Exibir mensagem de erro personalizada para o usuário
       _showErrorDialog(e.toString());
     }
   }
@@ -41,14 +41,112 @@ class _SignInPageState extends State<SignInPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Erro de Login'),
-          content: Text(message),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.error_outline, color: Colors.red),
+              SizedBox(width: 8),
+              Text(
+                'Erro',
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Fechar o dialog
+                Navigator.of(context).pop();
               },
-              child: const Text('OK'),
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.lightPurple,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _resetPassword() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      _showErrorDialog('Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    try {
+      final methods =
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+
+      if (methods.isEmpty) {
+        _showErrorDialog(
+            'E-mail não cadastrado. Por favor, verifique o e-mail ou cadastre-se.');
+        return;
+      }
+
+      await _authService.resetPassword(email);
+      _showSuccessDialog('E-mail de redefinição de senha enviado com sucesso!');
+    } on FirebaseAuthException catch (e) {
+      _showErrorDialog(
+          'Erro ao tentar redefinir a senha. Tente novamente mais tarde.');
+    } catch (e) {
+      _showErrorDialog('Erro desconhecido: ${e.toString()}');
+    }
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle_outline, color: Colors.green),
+              SizedBox(width: 8),
+              Text(
+                'Sucesso',
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.black54,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'OK',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.lightPurple,
+                ),
+              ),
             ),
           ],
         );
@@ -134,7 +232,8 @@ class _SignInPageState extends State<SignInPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed:
+                            _resetPassword, // Chama a função de redefinição de senha
                         child: const Text(
                           'Esqueci a senha?',
                           style: TextStyle(
