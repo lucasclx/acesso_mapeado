@@ -96,21 +96,6 @@ class OnboardingPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Esqueceu a senha?'),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'Redefinir senha',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.lightPurple),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
                   TextButton(
                     onPressed: () {
                       Navigator.push(

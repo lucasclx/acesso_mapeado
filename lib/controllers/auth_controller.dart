@@ -24,4 +24,12 @@ class AuthController {
   isValidEmail() {
     return email.contains('@') && email.contains('.');
   }
+
+ Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      rethrow; // Repassa o erro para ser tratado onde a função é chamada
+    }
+  }
 }
