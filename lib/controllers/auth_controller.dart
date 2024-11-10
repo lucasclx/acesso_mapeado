@@ -22,8 +22,6 @@ class AuthController {
   }
 
   isValidEmail(){
-    // Add your email validation logic here
-    // Example:
     return email.contains('@') && email.contains('.');
   }
 }
