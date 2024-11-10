@@ -24,8 +24,7 @@ class _SignUpPageState extends State<SignUpPage> {
       nameController: TextEditingController(),
       emailController: TextEditingController(),
       cpfController: MaskedTextController(mask: '000.000.000-00'),
-      dateOfBirthController:
-          MaskedTextController(mask: '00/00/0000'), // máscara de data
+      dateOfBirthController: MaskedTextController(mask: '00/00/0000'),
       passwordController: TextEditingController(),
       confirmPasswordController: TextEditingController(),
     );
@@ -157,7 +156,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: [
                     if (_currentStep == 0) _buildPersonalInfoStep(),
                     if (_currentStep == 1) _buildAccountDetailsStep(),
-                    if (_currentStep == 2) _buildConfirmationStep(),
+                    if (_currentStep == 2) _buildAccessibilityStep(),
                     const SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -251,11 +250,18 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget _buildPersonalInfoStep() {
     return Column(
       children: [
+        const SizedBox(height: 10),
         _buildTextField(
           _signUpController.nameController,
           'Nome',
           TextInputType.text,
           'Por favor, insira seu nome',
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Por favor, insira seu nome';
+            }
+            return null;
+          },
         ),
         const SizedBox(height: 20),
         _buildTextField(
@@ -289,6 +295,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const SizedBox(height: 10),
         _buildTextField(
           _signUpController.passwordController,
           'Senha',
@@ -309,7 +316,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _buildConfirmationStep() {
+  Widget _buildAccessibilityStep() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -321,7 +328,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 color: AppColors.black, fontSize: AppTypography.large),
           ),
         ),
-        SizedBox(height: AppSpacing.large),
+        const SizedBox(height: AppSpacing.large),
         ...accessibilityData.entries.map((entry) {
           String category = entry.key;
           List<Map<String, dynamic>> items = entry.value;
@@ -365,6 +372,7 @@ class _SignUpPageState extends State<SignUpPage> {
     bool confirmPassword = false,
     bool isCpf = false,
     bool isDateOfBirth = false,
+    FormFieldValidator<String>? validator,
   }) {
     return TextFormField(
       controller: controller,
@@ -376,33 +384,34 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       keyboardType: keyboardType,
       obscureText: isPassword,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return validationMessage;
-        }
-        if (isEmail && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-          return 'Por favor, insira um e-mail válido';
-        }
-        if (isCpf && !_signUpController.isValidCpf(controller.text)) {
-          return 'Por favor, insira um CPF válido';
-        }
-        if (isDateOfBirth &&
-            !_signUpController.isValidDateOfBirth(controller.text)) {
-          return 'Insira uma data de nascimento válida';
-        }
-        if (isPassword && !_signUpController.isValidPassword(value)) {
-          return 'A senha deve conter no mínimo 8 caracteres, incluindo: '
-              '\n- Uma letra maiúscula'
-              '\n- Uma letra minúscula'
-              '\n- Um número'
-              '\n- Um caractere especial';
-        }
-        if (confirmPassword &&
-            value != _signUpController.passwordController.text) {
-          return 'As senhas não correspondem';
-        }
-        return null;
-      },
+      validator: validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return validationMessage;
+            }
+            if (isEmail && !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+              return 'Por favor, insira um e-mail válido';
+            }
+            if (isCpf && !_signUpController.isValidCpf(controller.text)) {
+              return 'Por favor, insira um CPF válido';
+            }
+            if (isDateOfBirth &&
+                !_signUpController.isValidDateOfBirth(controller.text)) {
+              return 'Insira uma data de nascimento válida';
+            }
+            if (isPassword && !_signUpController.isValidPassword(value)) {
+              return 'A senha deve conter no mínimo 8 caracteres, incluindo: '
+                  '\n- Uma letra maiúscula'
+                  '\n- Uma letra minúscula'
+                  '\n- Um número'
+                  '\n- Um caractere especial';
+            }
+            if (confirmPassword &&
+                value != _signUpController.passwordController.text) {
+              return 'As senhas não correspondem';
+            }
+            return null;
+          },
     );
   }
 }
