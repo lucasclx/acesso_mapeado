@@ -1,3 +1,5 @@
+import 'package:acesso_mapeado/models/accessibility_model.dart';
+import 'package:acesso_mapeado/models/comment_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
@@ -308,22 +310,33 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
               ),
               // Acessibilidade
               if (widget.companyModel.accessibilityData != null &&
-                  widget.companyModel.accessibilityData!.isNotEmpty)
+                  widget.companyModel.accessibilityData!.accessibilityData
+                      .isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
-                  physics: // Desabilita o scroll interno
-                      const NeverScrollableScrollPhysics(),
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Desabilita o scroll interno
                   controller: scrollController,
-                  itemCount: widget.companyModel.accessibilityData!.length,
+                  itemCount: widget
+                      .companyModel.accessibilityData!.accessibilityData.length,
                   itemBuilder: (context, index) {
                     String category = widget
-                        .companyModel.accessibilityData!.keys
+                        .companyModel.accessibilityData!.accessibilityData.keys
                         .elementAt(index);
-                    List<Map<String, dynamic>> items =
-                        widget.companyModel.accessibilityData![category]!;
+                    List<AccessibilityItem> items = widget.companyModel
+                        .accessibilityData!.accessibilityData[category]!;
+
+                    // Converte cada AccessibilityItem em Map<String, dynamic>
+                    List<Map<String, dynamic>> itemsAsMap = items.map((item) {
+                      return {
+                        'tipo': item.type,
+                        'status': item.status,
+                      };
+                    }).toList();
+
                     return AccessibilitySection(
                       category: category,
-                      items: items,
+                      items: itemsAsMap, // Passa a lista convertida
                     );
                   },
                 ),
@@ -344,23 +357,29 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                   widget.companyModel.commentsData!.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
-                  physics: // Desabilita o scroll interno
-                      const NeverScrollableScrollPhysics(),
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Desabilita o scroll interno
                   controller: scrollController,
                   itemCount: widget.companyModel.commentsData!.length,
                   itemBuilder: (context, index) {
-                    var comment = widget.companyModel.commentsData![index];
-                    if (comment["text"] == null || comment["text"]!.isEmpty) {
+                    // Acessando diretamente um CommentModel
+                    CommentModel comment =
+                        widget.companyModel.commentsData![index];
+
+                    // Verifica se o texto do comentário não está vazio
+                    if (comment.text.isEmpty) {
                       return const SizedBox.shrink();
                     }
+
                     return CommentWidget(
-                      userName: comment["userName"],
-                      userImage: comment["userImage"],
-                      text: comment["text"],
-                      date: comment["date"],
+                      userName: comment.userName,
+                      userImage: comment.userImage,
+                      text: comment.text,
+                      date: comment.date,
                     );
                   },
                 ),
+
               const SizedBox(height: AppSpacing.extraMedium),
               // Seção de Desempenho da Empresa
               const Padding(

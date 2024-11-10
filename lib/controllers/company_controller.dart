@@ -23,11 +23,14 @@ class CompanyController {
   // Função para obter todas as empresas
   Future<List<CompanyModel>> getAllCompanies() async {
     try {
-      final response = await FirebaseFirestore.instance.collection('companies').get();
+      final response =
+          await FirebaseFirestore.instance.collection('companies').get();
 
-      List<CompanyModel> companies = response.docs
-          .map((doc) => CompanyModel.fromJson(doc.data()))
-          .toList();
+      List<CompanyModel> companies = response.docs.map((doc) {
+        Logger.logInfo('Documento Firestore: ${doc.data()}');
+        return CompanyModel.fromJson(doc.data());
+      }).toList();
+
       return companies;
     } catch (e) {
       Logger.logInfo('Erro ao obter empresas: $e');
@@ -44,7 +47,8 @@ class CompanyController {
           .get();
 
       List<CompanyModel> companies = querySnapshot.docs
-          .map((doc) => CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) =>
+              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       return companies;
     } catch (e) {
@@ -68,10 +72,12 @@ class CompanyController {
   // Função para obter todas as empresas ordenadas por rating decrescente
   Future<List<CompanyModel>> getAllCompaniesOrderByRating() async {
     try {
-      final response = await _companiesCollection.orderBy('rating', descending: true).get();
+      final response =
+          await _companiesCollection.orderBy('rating', descending: true).get();
 
       List<CompanyModel> companies = response.docs
-          .map((doc) => CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) =>
+              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
       return companies;
     } catch (e) {

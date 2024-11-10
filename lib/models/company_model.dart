@@ -1,3 +1,5 @@
+import 'package:acesso_mapeado/models/accessibility_model.dart';
+import 'package:acesso_mapeado/models/comment_model.dart';
 import 'package:uuid/uuid.dart';
 
 class CompanyModel {
@@ -10,9 +12,8 @@ class CompanyModel {
   double? rating;
   String? phoneNumber;
   String? workingHours;
-  Map<String, List<Map<String, dynamic>>>? accessibilityData;
-  List<Map<String, dynamic>>? commentsData;
-  Map<String, dynamic>? performanceData;
+  AccessibilityModel? accessibilityData;
+  List<CommentModel>? commentsData;
   List<double>? ratings;
   String cnpj;
   String? registrationDate;
@@ -32,7 +33,6 @@ class CompanyModel {
     this.workingHours,
     this.accessibilityData,
     this.commentsData,
-    this.performanceData,
     this.ratings,
     required this.cnpj,
     this.registrationDate,
@@ -40,41 +40,40 @@ class CompanyModel {
   }) : uuid = uuid ?? _uuid.v4();
 
   // Método factory para criar instâncias de CompanyModel a partir de um JSON
-  factory CompanyModel.fromJson(Map<String, dynamic> json) => CompanyModel(
-        uuid: json["uuid"],
-        name: json['name'],
-        latitude: (json['latitude'] as num).toDouble(),
-        longitude: (json['longitude'] as num).toDouble(),
-        address: json['address'],
-        imageUrl: json['imageUrl'],
-        rating:
-            json['rating'] != null ? (json['rating'] as num).toDouble() : null,
-        phoneNumber: json['phoneNumber'],
-        workingHours: json['workingHours'],
-        accessibilityData: json['accessibilityData'] != null
-            ? Map<String, List<Map<String, dynamic>>>.from(
-                json['accessibilityData'].map(
-                  (key, value) => MapEntry(
-                    key,
-                    List<Map<String, dynamic>>.from(value),
-                  ),
-                ),
-              )
-            : null,
-        commentsData: json['commentsData'] != null
-            ? List<Map<String, dynamic>>.from(json['commentsData'])
-            : null,
-        performanceData: json['performanceData'] != null
-            ? Map<String, dynamic>.from(json['performanceData'])
-            : null,
-        ratings: json['ratings'] != null
-            ? List<double>.from((json['ratings'] as List)
-                .map((item) => (item as num).toDouble()))
-            : [],
-        cnpj: json['cnpj'],
-        registrationDate: json['registrationDate'],
-        about: json['about'],
-      );
+  factory CompanyModel.fromJson(Map<String, dynamic> json) {
+    return CompanyModel(
+      uuid: json["uuid"] ?? _uuid.v4(),
+      name: json['name'] ?? '',
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      address: json['address'] ?? '',
+      imageUrl: json['imageUrl'],
+      rating:
+          json['rating'] != null ? (json['rating'] as num).toDouble() : null,
+      phoneNumber: json['phoneNumber'],
+      workingHours: json['workingHours'],
+      accessibilityData: json['accessibilityData'] != null &&
+              json['accessibilityData'] is Map<String, dynamic> &&
+              json['accessibilityData']['accessibilityData']
+                  is Map<String, dynamic>
+          ? AccessibilityModel.fromJson(
+              json['accessibilityData']['accessibilityData'])
+          : null,
+      commentsData: json['commentsData'] != null && json['commentsData'] is List
+          ? (json['commentsData'] as List)
+              .map((item) => CommentModel.fromJson(item))
+              .toList()
+          : null,
+      ratings: json['ratings'] != null && json['ratings'] is List
+          ? (json['ratings'] as List)
+              .map((item) => (item as num).toDouble())
+              .toList()
+          : [],
+      cnpj: json['cnpj'] ?? '',
+      registrationDate: json['registrationDate'],
+      about: json['about'],
+    );
+  }
 
   // Método para converter instâncias de CompanyModel para JSON
   Map<String, dynamic> toJson() => {
@@ -87,9 +86,9 @@ class CompanyModel {
         'rating': rating,
         'phoneNumber': phoneNumber,
         'workingHours': workingHours,
-        'accessibilityData': accessibilityData,
-        'commentsData': commentsData,
-        'performanceData': performanceData,
+        'accessibilityData': accessibilityData?.toJson(),
+        'commentsData':
+            commentsData?.map((comment) => comment.toJson()).toList(),
         'ratings': ratings,
         'cnpj': cnpj,
         'registrationDate': registrationDate,
