@@ -47,6 +47,9 @@ class SignUpController {
     try {
       final parts = date.split('/');
       if (parts.length != 3) return false;
+
+      if (parts[2].length != 4) return false;
+
       final day = int.parse(parts[0]);
       final month = int.parse(parts[1]);
       final year = int.parse(parts[2]);
@@ -108,6 +111,20 @@ class SignUpController {
       }
 
       try {
+        // Verificar se o CPF já existe no Firestore
+        final cpf = cpfController.text.replaceAll(RegExp(r'\D'), '');
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('cpf', isEqualTo: cpf)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Erro: CPF já cadastrado')),
+          );
+          return;
+        }
+
         UserCredential userCredential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
