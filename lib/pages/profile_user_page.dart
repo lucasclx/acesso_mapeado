@@ -121,24 +121,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                             horizontal: 16.0, vertical: 12.0)),
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Senha',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 12.0)),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 20),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: 'Confirmar senha',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsetsDirectional.symmetric(
-                            horizontal: 16.0, vertical: 12.0)),
-                    obscureText: true,
-                  ),
                   const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {
