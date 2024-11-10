@@ -1,3 +1,4 @@
+import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,31 @@ class SignUpController {
   final MaskedTextController dateOfBirthController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
+
+  final Map<String, List<Map<String, dynamic>>> accessibilityData = {
+    "Acessibilidade Física": [
+      {"tipo": "Rampas", "status": false},
+      {"tipo": "Elevadores", "status": false},
+      {"tipo": "Portas Largas", "status": false},
+      {"tipo": "Banheiros Adaptados", "status": false},
+      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+      {"tipo": "Estacionamento Reservado", "status": false}
+    ],
+    "Acessibilidade Comunicacional": [
+      {"tipo": "Sinalização com Braille e Pictogramas", "status": false},
+      {"tipo": "Informações Visuais Claras e Contrastantes", "status": false},
+      {"tipo": "Dispositivos Auditivos", "status": false},
+      {"tipo": "Documentos e Materiais em Formatos Acessíveis", "status": false}
+    ],
+    "Acessibilidade Sensorial": [
+      {"tipo": "Iluminação Adequada", "status": false},
+      {"tipo": "Redução de Ruídos", "status": false}
+    ],
+    "Acessibilidade Atitudinal": [
+      {"tipo": "Treinamento de Funcionários", "status": false},
+      {"tipo": "Políticas Inclusivas", "status": false}
+    ],
+  };
 
   SignUpController({
     required this.formKey,
@@ -133,6 +159,27 @@ class SignUpController {
 
         final user = userCredential.user;
 
+        Map<String, List<AccessibilityItem>> selectedAccessibility = {};
+
+        accessibilityData.forEach((category, items) {
+          List<AccessibilityItem> selectedItems = items
+              .where((item) => item['status'] == true)
+              .map((item) => AccessibilityItem(
+                    type: item['tipo'],
+                    status: item['status'],
+                  ))
+              .toList();
+
+          if (selectedItems.isNotEmpty) {
+            selectedAccessibility[category] = selectedItems;
+          }
+        });
+
+        // Cria a instância de AccessibilityModel com os dados selecionados
+        AccessibilityModel accessibilityModel = AccessibilityModel(
+          accessibilityData: selectedAccessibility,
+        );
+
         UserModel newUser = UserModel(
           name: nameController.text,
           email: emailController.text,
@@ -141,6 +188,7 @@ class SignUpController {
           profilePictureUrl: 'user/profile',
           dateOfBirth: parsedDate,
           registrationDate: DateTime.now(),
+          accessibilityData: accessibilityModel,
         );
 
         await FirebaseFirestore.instance

@@ -329,7 +329,7 @@ class _SignUpPageState extends State<SignUpPage> {
           ),
         ),
         const SizedBox(height: AppSpacing.large),
-        ...accessibilityData.entries.map((entry) {
+        ..._signUpController.accessibilityData.entries.map((entry) {
           String category = entry.key;
           List<Map<String, dynamic>> items = entry.value;
           return ExpansionTile(
