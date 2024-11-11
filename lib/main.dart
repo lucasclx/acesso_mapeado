@@ -1,4 +1,5 @@
 import 'package:acesso_mapeado/app.dart';
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +16,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
             create: (_) => CompanyState()), // Fornecendo o estado das empresas
+         ChangeNotifierProvider(
+          create: (_) => AuthProvider(), // Fornecendo o estado de autenticação
+        ),
       ],
       child: const App(),
     ),
