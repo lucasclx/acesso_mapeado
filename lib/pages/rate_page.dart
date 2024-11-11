@@ -1,8 +1,10 @@
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,40 @@ class _RatePageState extends State<RatePage> {
   List<CompanyModel> companies = [];
 
   bool sending = false;
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserName(); // Chama a função para buscar o nome do usuário
+  }
+
+  // Função para buscar o nome do usuário com base no e-mail
+  Future<void> _getUserName() async {
+    final userEmail =
+        Provider.of<AuthProvider>(context, listen: false).user?.email;
+    if (userEmail != null) {
+      try {
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: userEmail)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isNotEmpty) {
+          setState(() {
+            userName = userSnapshot.docs.first['name'] ?? 'Nome não encontrado';
+          });
+        } else {
+          setState(() {
+            userName = 'Nome não encontrado';
+          });
+        }
+      } catch (e) {
+        Logger.logError('Erro ao buscar nome do usuário: $e');
+      }
+    }
+  }
 
   // Função para adicionar comentário e avaliação
   addCommentAndRating() async {
@@ -37,8 +73,8 @@ class _RatePageState extends State<RatePage> {
       sending = true;
     });
 
-    bool result =
-        await _company.addUserComment(widget.company.uuid, _comment.text);
+    bool result = await _company.addUserComment(
+        widget.company.uuid, _comment.text, _rating, context);
     bool ratingResult =
         await _company.addCompanyUserRating(widget.company.uuid, _rating);
     await getCompanies();
@@ -94,6 +130,8 @@ class _RatePageState extends State<RatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        Provider.of<AuthProvider>(context).user; // Obtendo o usuário logado
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -132,19 +170,19 @@ class _RatePageState extends State<RatePage> {
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(10),
-              child: const Row(
+              child: Row(
                 children: [
                   SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Nome do Usuário',
-                        style: TextStyle(
+                        user != null ? userName : 'Nome do Usuário',
+                        style: const TextStyle(
                             fontSize: 18, color: AppColors.lightPurple),
                       ),
-                      SizedBox(height: 4),
-                      Row(
+                      const SizedBox(height: 4),
+                      const Row(
                         children: [
                           Text(
                             'Sua postagem será pública.',

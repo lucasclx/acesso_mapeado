@@ -1,8 +1,10 @@
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:acesso_mapeado/shared/mock_companies.dart';
+import 'package:provider/provider.dart';
 
 // CompanyState gerencia o estado das empresas e notifica os widgets
 class CompanyState extends ChangeNotifier {
@@ -188,8 +190,30 @@ class CompanyController {
   }
 
   // Função que adiciona o comentário do usuario à empresa
-  Future<bool> addUserComment(String companyUUID, String comment) async {
+  Future<bool> addUserComment(String companyUUID, String comment,
+      double userRating, BuildContext context) async {
     try {
+      // Obtém o email do usuário logado
+      final userEmail =
+          Provider.of<AuthProvider>(context, listen: false).user?.email;
+
+      String userName = 'Nome não encontrado';
+
+      if (userEmail != null) {
+        try {
+          final userSnapshot = await FirebaseFirestore.instance
+              .collection('users')
+              .where('email', isEqualTo: userEmail)
+              .limit(1)
+              .get();
+
+          if (userSnapshot.docs.isNotEmpty) {
+            userName = userSnapshot.docs.first['name'] ?? 'Nome não encontrado';
+          }
+        } catch (e) {
+          Logger.logError('Erro ao buscar nome do usuário: $e');
+        }
+      }
       QuerySnapshot querySnapshot = await _companiesCollection
           .where('uuid', isEqualTo: companyUUID)
           .get();
@@ -206,10 +230,11 @@ class CompanyController {
           List<Map<String, dynamic>>.from(data['commentsData'] ?? []);
 
       var commentData = {
-        'userName': 'João Silva',
+        'userName': userName,
         'userImage': 'https://via.placeholder.com/50.png?text=João',
         'text': comment,
         'date': DateTime.now().toString(),
+        'rate': userRating,
       };
 
       commentsData.add(commentData);
