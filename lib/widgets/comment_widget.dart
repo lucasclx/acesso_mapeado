@@ -7,7 +7,7 @@ class CommentWidget extends StatelessWidget {
   final String? userImage;
   final String? text;
   final String? date;
-  final int? ratingsCount;
+  final double? rate;
 
   const CommentWidget({
     super.key,
@@ -15,7 +15,7 @@ class CommentWidget extends StatelessWidget {
     this.userImage,
     this.text,
     this.date,
-    this.ratingsCount,
+    this.rate,
   });
 
   @override
@@ -53,7 +53,7 @@ class CommentWidget extends StatelessWidget {
                           children: List.generate(5, (index) {
                             return Icon(
                               Icons.star,
-                              color: index < (ratingsCount ?? 0)
+                              color: index < (rate ?? 0)
                                   ? Colors.yellow
                                   : Colors.grey,
                               size: 20,
@@ -75,7 +75,7 @@ class CommentWidget extends StatelessWidget {
                       date != null
                           ? formatDate(
                               DateTime.parse(date!),
-                              [hh, ':', nn, ' ', dd, '/', mm, '/', yyyy],
+                              [HH, ':', nn, ' ', dd, '/', mm, '/', yyyy],
                             )
                           : 'Data não disponível',
                       style: const TextStyle(
