@@ -26,9 +26,10 @@ class _SignInPageState extends State<SignInPage> {
         _passwordController.text.trim(),
       );
       if (user != null) {
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
+          (Route<dynamic> route) => false,
         );
       }
     } on Exception catch (e) {

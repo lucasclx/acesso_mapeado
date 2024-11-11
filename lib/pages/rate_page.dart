@@ -1,8 +1,10 @@
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,40 @@ class _RatePageState extends State<RatePage> {
   List<CompanyModel> companies = [];
 
   bool sending = false;
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserName(); // Chama a função para buscar o nome do usuário
+  }
+
+  // Função para buscar o nome do usuário com base no e-mail
+  Future<void> _getUserName() async {
+    final userEmail =
+        Provider.of<AuthProvider>(context, listen: false).user?.email;
+    if (userEmail != null) {
+      try {
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: userEmail)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isNotEmpty) {
+          setState(() {
+            userName = userSnapshot.docs.first['name'] ?? 'Nome não encontrado';
+          });
+        } else {
+          setState(() {
+            userName = 'Nome não encontrado';
+          });
+        }
+      } catch (e) {
+        Logger.logError('Erro ao buscar nome do usuário: $e');
+      }
+    }
+  }
 
   // Função para adicionar comentário e avaliação
   addCommentAndRating() async {
@@ -37,8 +73,8 @@ class _RatePageState extends State<RatePage> {
       sending = true;
     });
 
-    bool result =
-        await _company.addUserComment(widget.company.uuid, _comment.text);
+    bool result = await _company.addUserComment(
+        widget.company.uuid, _comment.text, _rating, context);
     bool ratingResult =
         await _company.addCompanyUserRating(widget.company.uuid, _rating);
     await getCompanies();
@@ -94,6 +130,8 @@ class _RatePageState extends State<RatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        Provider.of<AuthProvider>(context).user; // Obtendo o usuário logado
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -126,100 +164,103 @@ class _RatePageState extends State<RatePage> {
         ),
       ),
       backgroundColor: AppColors.white,
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: const Row(
-              children: [
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Nome do Usuário',
-                      style:
-                          TextStyle(fontSize: 18, color: AppColors.lightPurple),
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          'Sua postagem será pública.',
-                          style: TextStyle(
-                              fontSize: 14, color: AppColors.darkGray),
-                        ),
-                        Icon(Icons.warning_rounded,
-                            color: AppColors.lightPurple),
-                      ],
-                    )
-                  ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user != null ? userName : 'Nome do Usuário',
+                        style: const TextStyle(
+                            fontSize: 18, color: AppColors.lightPurple),
+                      ),
+                      const SizedBox(height: 4),
+                      const Row(
+                        children: [
+                          Text(
+                            'Sua postagem será pública.',
+                            style: TextStyle(
+                                fontSize: 14, color: AppColors.darkGray),
+                          ),
+                          Icon(Icons.warning_rounded,
+                              color: AppColors.lightPurple),
+                        ],
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: RatingBar.builder(
+                initialRating: _rating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemBuilder: (context, _) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: RatingBar.builder(
-              initialRating: _rating,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: true,
-              itemCount: 5,
-              itemBuilder: (context, _) => const Icon(
-                Icons.star,
-                color: Colors.amber,
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    _rating = rating; // Atualizar o rating
+                  });
+                },
               ),
-              onRatingUpdate: (rating) {
-                setState(() {
-                  _rating = rating; // Atualizar o rating
-                });
-              },
             ),
-          ),
-          const SizedBox(height: 16.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              maxLines: 4,
-              controller: _comment,
-              decoration: InputDecoration(
-                hintText: 'Conte como foi sua experiência neste lugar',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+            const SizedBox(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                maxLines: 4,
+                controller: _comment,
+                decoration: InputDecoration(
+                  hintText: 'Conte como foi sua experiência neste lugar',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add_a_photo, color: AppColors.lightPurple),
-              label: const Text(
-                'Adicionar foto',
-                style: TextStyle(color: AppColors.lightPurple),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: TextButton.icon(
+                onPressed: () {},
+                icon:
+                    const Icon(Icons.add_a_photo, color: AppColors.lightPurple),
+                label: const Text(
+                  'Adicionar foto',
+                  style: TextStyle(color: AppColors.lightPurple),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                addCommentAndRating();
-              },
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                backgroundColor: AppColors.lightPurple,
-              ),
-              child: const Text(
-                'Enviar avaliação',
-                style: TextStyle(color: AppColors.white, fontSize: 18),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  addCommentAndRating();
+                },
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  backgroundColor: AppColors.lightPurple,
+                ),
+                child: const Text(
+                  'Enviar avaliação',
+                  style: TextStyle(color: AppColors.white, fontSize: 18),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

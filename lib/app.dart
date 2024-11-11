@@ -13,6 +13,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // desativar o banner
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashPage(),

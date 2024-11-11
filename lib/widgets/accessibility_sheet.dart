@@ -376,6 +376,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                       userImage: comment.userImage,
                       text: comment.text,
                       date: comment.date,
+                      rate: comment.rate,
                     );
                   },
                 ),

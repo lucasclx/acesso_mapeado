@@ -1,9 +1,31 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+// Para gerenciar o estado de autenticação
+class AuthProvider with ChangeNotifier {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
+
+  AuthProvider() {
+    _user = _auth.currentUser;
+    _auth.authStateChanges().listen((user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  // retorna o usuário logado
+  User? get user => _user;
+
+  // verifica se o usuário está logado
+  bool get isAuthenticated => _user != null;
+}
 
 class AuthController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? _user;
 
-  get email => null;
+  User? get user => _user;
 
   Future<User?> signIn(String email, String password) async {
     try {
@@ -11,9 +33,10 @@ class AuthController {
         email: email,
         password: password,
       );
-      return userCredential.user;
+      _user = userCredential.user;
+      return _user;
     } on FirebaseAuthException catch (e) {
-      throw Exception('Erro ao realizar o login. Por favor, tente novamente.');
+      throw Exception('Erro ao realizar o login.');
     }
   }
 
@@ -21,15 +44,15 @@ class AuthController {
     await _auth.signOut();
   }
 
-  isValidEmail() {
+  bool isValidEmail(String email) {
     return email.contains('@') && email.contains('.');
   }
 
- Future<void> resetPassword(String email) async {
+  Future<void> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      rethrow; // Repassa o erro para ser tratado onde a função é chamada
+      rethrow;
     }
   }
 }
