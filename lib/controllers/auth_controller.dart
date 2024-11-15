@@ -1,12 +1,42 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:acesso_mapeado/models/company_model.dart';
+import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-// Para gerenciar o estado de autenticação
-class AuthProvider with ChangeNotifier {
+class UserController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  AuthProvider() {
+  User? _user;
+  UserModel? _userModel;
+  CompanyModel? _companyModel;
+
+  CompanyModel? get companyModel => _companyModel;
+
+  void updateCompanyModel(CompanyModel companyModel) {
+    _companyModel = companyModel;
+    notifyListeners();
+  }
+
+  UserModel? get userModel => _userModel;
+
+  void updateUserModel(UserModel userModel) {
+    _userModel = userModel;
+    notifyListeners();
+  }
+
+  void logout() {
+    _auth.signOut();
+    _user = null;
+    _userModel = null;
+    notifyListeners();
+  }
+
+  UserController() {
     _user = _auth.currentUser;
     _auth.authStateChanges().listen((user) {
       _user = user;
@@ -19,13 +49,6 @@ class AuthProvider with ChangeNotifier {
 
   // verifica se o usuário está logado
   bool get isAuthenticated => _user != null;
-}
-
-class AuthController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  User? _user;
-
-  User? get user => _user;
 
   Future<User?> signIn(String email, String password) async {
     try {
@@ -42,6 +65,9 @@ class AuthController {
 
   Future<void> signOut() async {
     await _auth.signOut();
+    _user = null;
+    _userModel = null;
+    notifyListeners();
   }
 
   bool isValidEmail(String email) {
@@ -54,5 +80,51 @@ class AuthController {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<void> updateProfilePhoto(File imageFile) async {
+    try {
+      if (_user != null) {
+        final base64Image = await imageFile.readAsBytes();
+        final photoUrl = base64Encode(base64Image);
+
+        await _firestore.collection('users').doc(_user!.uid).update({
+          'profilePictureUrl': photoUrl,
+        });
+
+        await loadUserProfile();
+
+        notifyListeners();
+      }
+    } catch (e) {
+      throw Exception('Error updating profile photo - $e');
+    }
+  }
+
+  //remove profile photo
+  Future<void> removeProfilePhoto() async {
+    await _firestore.collection('users').doc(_user!.uid).update({
+      'profilePictureUrl': null,
+    });
+
+    await loadUserProfile();
+
+    notifyListeners();
+  }
+
+  Future<UserModel?> loadUserProfile() async {
+    final userDoc = await _firestore.collection('users').doc(_user!.uid).get();
+    if (userDoc.exists) {
+      _userModel = UserModel.fromJson(userDoc.data()!);
+    }
+
+    notifyListeners();
+    return _userModel;
+  }
+
+  Future<void> loadCompanyProfile() async {
+    final companyDoc =
+        await _firestore.collection('companies').doc(_user!.uid).get();
+    _companyModel = CompanyModel.fromJson(companyDoc.data() ?? {});
   }
 }

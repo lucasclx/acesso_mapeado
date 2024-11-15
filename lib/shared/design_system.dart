@@ -28,6 +28,9 @@ class AppColors {
 
   /// Um amarelo claro usado para destaques ou ícones.
   static const Color yellow = Color(0xFFFDD835);
+
+  /// Um verde claro usado para destaques ou ícones.
+  static const Color green = Color(0xFF4CAF50);
 }
 
 /// Uma classe que define os valores de espaçamento do aplicativo.

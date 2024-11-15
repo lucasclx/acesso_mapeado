@@ -41,15 +41,15 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                   Marker(
                     markerId: MarkerId(widget.companyModel.name),
                     position: LatLng(
-                      widget.companyModel.latitude,
-                      widget.companyModel.longitude,
+                      widget.companyModel.latitude ?? 0.0,
+                      widget.companyModel.longitude ?? 0.0,
                     ),
                   ),
                 },
                 initialCameraPosition: CameraPosition(
                   target: LatLng(
-                    widget.companyModel.latitude,
-                    widget.companyModel.longitude,
+                    widget.companyModel.latitude ?? 0.0,
+                    widget.companyModel.longitude ?? 0.0,
                   ),
                   zoom: 15,
                 ),
@@ -241,8 +241,8 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                       markers: <Marker>{
                         Marker(
                           markerId: MarkerId(widget.companyModel.name),
-                          position: LatLng(widget.companyModel.latitude,
-                              widget.companyModel.longitude),
+                          position: LatLng(widget.companyModel.latitude ?? 0.0,
+                              widget.companyModel.longitude ?? 0.0),
                           infoWindow: InfoWindow(
                             title: widget.companyModel.name,
                             snippet: widget.companyModel.address,
@@ -250,8 +250,8 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                         ),
                       },
                       initialCameraPosition: CameraPosition(
-                        target: LatLng(widget.companyModel.latitude,
-                            widget.companyModel.longitude),
+                        target: LatLng(widget.companyModel.latitude ?? 0.0,
+                            widget.companyModel.longitude ?? 0.0),
                         zoom: 15,
                       ),
                       zoomGesturesEnabled: false,
@@ -290,11 +290,11 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                       'Telefone não disponível',
                 ),
               ),
-              InfoTile(
-                icon: Icons.access_time,
-                text: widget.companyModel.workingHours ??
-                    'Horário de funcionamento não disponível',
-              ),
+              // InfoTile(
+              //   icon: Icons.access_time,
+              //   text: widget.companyModel.workingHours ??
+              //       'Horário de funcionamento não disponível',
+              // ),
               const SizedBox(height: AppSpacing.extraMedium),
               // Seção de Acessibilidade
               const Padding(
@@ -366,11 +366,6 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                     CommentModel comment =
                         widget.companyModel.commentsData![index];
 
-                    // Verifica se o texto do comentário não está vazio
-                    if (comment.text.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-
                     return CommentWidget(
                       userName: comment.userName,
                       userImage: comment.userImage,
@@ -401,10 +396,12 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                 itemCount: 5,
                 itemBuilder: (context, index) {
                   final rating = 5 - index;
-                  final count = widget.companyModel.ratings
-                          ?.where((r) => r.round() == rating)
-                          .length ??
-                      0;
+                  final ratings = widget.companyModel.ratings;
+                  final count =
+                      ratings?.where((r) => r.round() == rating).length ?? 0;
+                  final total = ratings?.length ?? 0;
+                  final value = total > 0 ? count / total : 0.0;
+
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 4.0),
@@ -421,8 +418,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: LinearProgressIndicator(
-                            value: count /
-                                (widget.companyModel.ratings?.length ?? 1),
+                            value: value,
                             backgroundColor: AppColors.lightGray,
                             valueColor: const AlwaysStoppedAnimation<Color>(
                                 AppColors.lightPurple),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +39,7 @@ class _HomePageState extends State<HomePage> {
       Logger.logInfo("Empresas carregadas: ${companies.length}");
 
       if (!mounted) return;
-      Provider.of<CompanyState>(context, listen: false)
+      Provider.of<CompanyController>(context, listen: false)
           .updateCompanies(companies);
       setState(() {});
     } catch (e) {
@@ -131,8 +132,8 @@ class _HomePageState extends State<HomePage> {
   ];
 
   // Métodos para construir cada página
-  Widget _buildHomePage(CompanyState companyState) {
-    List<CompanyModel> companies = companyState.companies;
+  Widget _buildHomePage(CompanyController companyController) {
+    List<CompanyModel> companies = companyController.companies;
 
     return ListView.builder(
       itemCount: companies.length,
@@ -196,7 +197,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final companyState = Provider.of<CompanyState>(context);
+    final companyState = Provider.of<CompanyController>(context);
     return Scaffold(
       appBar: homeAppBar(),
       backgroundColor: AppColors.white,

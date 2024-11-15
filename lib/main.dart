@@ -15,9 +15,11 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => CompanyState()), // Fornecendo o estado das empresas
-         ChangeNotifierProvider(
-          create: (_) => AuthProvider(), // Fornecendo o estado de autenticação
+            create: (_) =>
+                CompanyController()), // Fornecendo o estado das empresas
+        ChangeNotifierProvider(
+          create: (_) =>
+              UserController(), // Fornecendo o estado de autenticação
         ),
       ],
       child: const App(),
