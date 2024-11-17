@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             leading: CircleAvatar(
               backgroundImage: company.imageUrl != null
                   ? NetworkImage(company.imageUrl!)
-                  : const AssetImage('assets/images/placeholder-company.png')
+                  : const AssetImage('assets/images/img-company.png')
                       as ImageProvider,
               radius: 29,
             ),
@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           _buildHomePage(companyState),
           _buildRankingPage(),
-          const ProfileUserPage(),
+           const ProfileUserPage(),
         ],
       ),
       drawer: homeDrawer(context),
@@ -216,6 +216,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
 
   Drawer homeDrawer(BuildContext context) {
     return Drawer(
