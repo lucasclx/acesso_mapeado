@@ -23,14 +23,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final TextEditingController _searchController = TextEditingController();
+  List<CompanyModel> filteredCompanies = [];
   @override
   void initState() {
     getCompanies();
     super.initState();
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -42,6 +47,8 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
       Provider.of<CompanyController>(context, listen: false)
           .updateCompanies(companies);
+      filteredCompanies = companies;
+
       setState(() {});
     } catch (e) {
       Logger.logError('Erro ao carregar empresas: $e');
@@ -113,11 +120,72 @@ class _HomePageState extends State<HomePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: const Color.fromARGB(0, 185, 33, 33),
       builder: (BuildContext context) {
         return AccessibilitySheet(companyModel: companyModel);
       },
     );
+  }
+
+  // Função que filtra os dados na barra de pesquisa
+  void _onSearchChanged() {
+    String searchTerm = _searchController.text.toLowerCase();
+    setState(() {
+      filteredCompanies = companies.where((company) {
+        return company.name.toLowerCase().contains(searchTerm);
+      }).toList();
+    });
+  }
+
+  List<String> getSelectedAccessibilityOptions() {
+    List<String> selectedOptions = [];
+    accessibilityData.forEach((category, items) {
+      for (var item in items) {
+        if (item['status'] == true) {
+          selectedOptions.add(item['tipo']);
+        }
+      }
+    });
+    return selectedOptions;
+  }
+
+  // Função para filtrar as empresas por acessibilidade
+  void filterCompanies() {
+    List<String> selectedOptions = getSelectedAccessibilityOptions();
+
+    setState(() {
+      filteredCompanies = companies.where((company) {
+        bool hasAllSelectedOptions = true;
+
+        if (company.accessibilityData != null) {
+          var accessibilityMap = company.accessibilityData!.accessibilityData;
+
+          for (String option in selectedOptions) {
+            bool optionFound = false;
+
+            for (var category in accessibilityMap.entries) {
+              for (var item in category.value) {
+                if (item.type == option && item.status == true) {
+                  optionFound = true;
+                  break;
+                }
+              }
+              if (optionFound) break;
+            }
+
+            if (!optionFound) {
+              hasAllSelectedOptions = false;
+              break;
+            }
+          }
+        } else {
+          hasAllSelectedOptions = false;
+        }
+
+        // Retorna se a empresa atende todas as opções de acessibilidade selecionadas
+        return hasAllSelectedOptions;
+      }).toList();
+    });
   }
 
   final CompanyController _companyController = CompanyController();
@@ -134,61 +202,88 @@ class _HomePageState extends State<HomePage> {
 
   // Métodos para construir cada página
   Widget _buildHomePage(CompanyController companyController) {
-    List<CompanyModel> companies = companyController.companies;
-
-    return ListView.builder(
-      itemCount: companies.length,
-      itemBuilder: (context, index) {
-        final company = companies[index];
-        return Card(
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: company.imageUrl != null
-                  ? NetworkImage(company.imageUrl!)
-                  : const AssetImage('assets/images/img-company.png')
-                      as ImageProvider,
-              radius: 29,
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              labelText: "Pesquisar",
+              hintText: "Digite o nome da empresa",
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(25.0))),
             ),
-            title: Text(company.name),
-            subtitle: Row(
-              children: List.generate(5, (starIndex) {
-                return Icon(
-                  Icons.star,
-                  color: starIndex < (company.rating ?? 0)
-                      ? Colors.yellow
-                      : Colors.grey,
-                  size: 20,
-                );
-              }),
-            ),
-            trailing: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.lightPurple),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.info,
-                        color: AppColors.lightPurple,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        'Saiba mais',
-                        style: TextStyle(color: AppColors.lightPurple),
-                      ),
-                    ],
-                  ),
-                )),
-            onTap: () {
-              _showAccessibilitySheet(company);
-            },
           ),
-        );
-      },
+        ),
+        Expanded(
+          child: filteredCompanies.isEmpty // verificar se a lista está vazia
+              ? Center(
+                  child: Text(
+                    'Nenhuma empresa encontrada.',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: filteredCompanies.length,
+                  itemBuilder: (context, index) {
+                    final company = filteredCompanies[index];
+                    return Card(
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: company.imageUrl != null
+                              ? NetworkImage(company.imageUrl!)
+                              : AssetImage('assets/images/img-company.png')
+                                  as ImageProvider,
+                          radius: 29,
+                        ),
+                        title: Text(company.name),
+                        subtitle: Row(
+                          children: List.generate(5, (starIndex) {
+                            return Icon(
+                              Icons.star,
+                              color: starIndex < (company.rating ?? 0)
+                                  ? Colors.yellow
+                                  : Colors.grey,
+                              size: 20,
+                            );
+                          }),
+                        ),
+                        trailing: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.lightPurple),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.info,
+                                  color: AppColors.lightPurple,
+                                ),
+                                SizedBox(width: 5),
+                                Text(
+                                  'Saiba mais',
+                                  style:
+                                      TextStyle(color: AppColors.lightPurple),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        onTap: () {
+                          _showAccessibilitySheet(company);
+                        },
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 
@@ -257,23 +352,24 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 45),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignInPage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.lightPurple,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                textStyle:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              child: const Text(
-                'Buscar',
-                style: TextStyle(color: AppColors.white),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  filterCompanies();
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.lightPurple,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                child: const Text(
+                  'Buscar',
+                  style: TextStyle(color: AppColors.white),
+                ),
               ),
             ),
           ),
@@ -288,18 +384,16 @@ class _HomePageState extends State<HomePage> {
         indexTitle[_selectedIndex],
       ),
       backgroundColor: AppColors.white,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.add, color: Colors.green),
-          tooltip: 'Inserir Dados de Mock',
-          onPressed: _insertMockData,
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          tooltip: 'Remover Todas as Empresas',
-          onPressed: _removeAllCompanies,
-        ),
-      ],
+      flexibleSpace: Container(
+        decoration: BoxDecoration(color: AppColors.white, boxShadow: [
+          BoxShadow(
+            color: AppColors.darkGray.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ]),
+      ),
     );
   }
 }
