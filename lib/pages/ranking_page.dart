@@ -27,7 +27,6 @@ class _RankingPageState extends State<RankingPage> {
     try {
       rankedCompanies = await _companyController.getAllCompaniesOrderByRating();
     } catch (e) {
-      // Log error and handle the case where fetching fails
       Logger.logInfo('Error fetching ranked companies: $e');
     } finally {
       setState(() {
@@ -127,6 +126,7 @@ class _RankingPageState extends State<RankingPage> {
           : rankedCompanies.isEmpty
               ? _buildEmptyMessage()
               : ListView.builder(
+                  padding: const EdgeInsets.only(top: 14),
                   itemCount: rankedCompanies.length,
                   itemBuilder: (context, index) {
                     final company = rankedCompanies[index];

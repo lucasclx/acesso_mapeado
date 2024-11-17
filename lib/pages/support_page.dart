@@ -60,10 +60,7 @@ class _SupportPageState extends State<SupportPage> {
         leading: IconButton(
           icon: Image.asset('assets/icons/arrow-left.png'),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileUserPage()),
-            );
+            Navigator.pop(context);
           },
         ),
       ),

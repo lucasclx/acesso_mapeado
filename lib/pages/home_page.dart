@@ -256,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                             border: Border.all(color: AppColors.lightPurple),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Padding(
+                          child: const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -307,7 +307,7 @@ class _HomePageState extends State<HomePage> {
           ProfileUserPage()
         ],
       ),
-      drawer: homeDrawer(context),
+      drawer: _selectedIndex == 0 ? homeDrawer(context) : null,
       bottomNavigationBar: AppNavbar(
         selectedIndex: _selectedIndex,
         onItemTapped: _onItemTapped,
@@ -384,6 +384,16 @@ class _HomePageState extends State<HomePage> {
         indexTitle[_selectedIndex],
       ),
       backgroundColor: AppColors.white,
+      leading: _selectedIndex != 0
+          ? IconButton(
+              icon: Image.asset('assets/icons/arrow-left.png'),
+              onPressed: () {
+                setState(() {
+                  _selectedIndex = 0;
+                });
+              },
+            )
+          : null,
       flexibleSpace: Container(
         decoration: BoxDecoration(color: AppColors.white, boxShadow: [
           BoxShadow(
