@@ -1,10 +1,15 @@
 import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/models/company_model.dart';
+import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -17,7 +22,7 @@ class _SignInPageState extends State<SignInPage> {
   bool _isPasswordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final AuthController _authService = AuthController();
+  final UserController _authService = UserController();
 
   Future<void> _signIn() async {
     try {
@@ -25,12 +30,41 @@ class _SignInPageState extends State<SignInPage> {
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
+
       if (user != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (Route<dynamic> route) => false,
-        );
+        // First check if it's a company account
+        final companyData = await FirebaseFirestore.instance
+            .collection('companies')
+            .doc(user.uid)
+            .get();
+
+        if (companyData.exists) {
+          // It's a company account
+          final companyModel = CompanyModel.fromJson(companyData.data()!);
+          Provider.of<UserController>(context, listen: false)
+              .updateCompanyModel(companyModel);
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const CompanyHomePage()),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          // It's a regular user account
+          final userData = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          final userModel = UserModel.fromJson(userData.data()!);
+          Provider.of<UserController>(context, listen: false)
+              .updateUserModel(userModel);
+
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+            (Route<dynamic> route) => false,
+          );
+        }
       }
     } on Exception catch (e) {
       _showErrorDialog(e.toString());

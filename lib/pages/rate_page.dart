@@ -29,34 +29,6 @@ class _RatePageState extends State<RatePage> {
   @override
   void initState() {
     super.initState();
-    _getUserName(); // Chama a função para buscar o nome do usuário
-  }
-
-  // Função para buscar o nome do usuário com base no e-mail
-  Future<void> _getUserName() async {
-    final userEmail =
-        Provider.of<AuthProvider>(context, listen: false).user?.email;
-    if (userEmail != null) {
-      try {
-        final userSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .where('email', isEqualTo: userEmail)
-            .limit(1)
-            .get();
-
-        if (userSnapshot.docs.isNotEmpty) {
-          setState(() {
-            userName = userSnapshot.docs.first['name'] ?? 'Nome não encontrado';
-          });
-        } else {
-          setState(() {
-            userName = 'Nome não encontrado';
-          });
-        }
-      } catch (e) {
-        Logger.logError('Erro ao buscar nome do usuário: $e');
-      }
-    }
   }
 
   // Função para adicionar comentário e avaliação
@@ -116,7 +88,7 @@ class _RatePageState extends State<RatePage> {
       Logger.logInfo("Empresas carregadas: ${companies.length}");
 
       if (!mounted) return;
-      Provider.of<CompanyState>(context, listen: false)
+      Provider.of<CompanyController>(context, listen: false)
           .updateCompanies(companies);
       setState(() {});
     } catch (e) {
@@ -130,8 +102,6 @@ class _RatePageState extends State<RatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final user =
-        Provider.of<AuthProvider>(context).user; // Obtendo o usuário logado
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -177,7 +147,7 @@ class _RatePageState extends State<RatePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user != null ? userName : 'Nome do Usuário',
+                        Provider.of<UserController>(context).userModel!.name,
                         style: const TextStyle(
                             fontSize: 18, color: AppColors.lightPurple),
                       ),

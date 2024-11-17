@@ -1,20 +1,33 @@
+import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomePage()));
+        final userProfile =
+            await Provider.of<UserController>(context, listen: false)
+                .loadUserProfile();
+        if (userProfile != null) {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        } else {
+          await Provider.of<UserController>(context, listen: false)
+              .loadCompanyProfile();
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const CompanyHomePage()));
+        }
       } else {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const OnboardingPage()));

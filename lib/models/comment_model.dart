@@ -1,13 +1,13 @@
 class CommentModel {
   final String userName;
-  final String userImage;
+  final String? userImage;
   final String text;
   final String date;
   final double? rate;
 
   CommentModel({
     required this.userName,
-    required this.userImage,
+    this.userImage,
     required this.text,
     required this.date,
     this.rate = 0.0,

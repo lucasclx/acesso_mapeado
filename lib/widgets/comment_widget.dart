@@ -62,15 +62,11 @@ class CommentWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4.0),
-                    Text(
-                      text ?? 'Comentário não disponível',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.darkGray,
-                      ),
-                    ),
-                    const SizedBox(height: 4.0),
+                    ...[
+                      if (text != null && text!.isNotEmpty)
+                        Text(text ?? 'Comentário não disponível'),
+                      const SizedBox(height: 4.0),
+                    ],
                     Text(
                       date != null
                           ? formatDate(

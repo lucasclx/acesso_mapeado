@@ -68,7 +68,7 @@ class _RankingPageState extends State<RankingPage> {
         leading: CircleAvatar(
           backgroundImage: company.imageUrl != null
               ? NetworkImage(company.imageUrl!)
-              : const AssetImage('assets/images/placeholder-company.png')
+              : const AssetImage('assets/images/img-company.png')
                   as ImageProvider,
           radius: 29,
         ),

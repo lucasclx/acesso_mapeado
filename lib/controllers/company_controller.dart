@@ -1,13 +1,68 @@
 import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:acesso_mapeado/shared/mock_companies.dart';
 import 'package:provider/provider.dart';
 
-// CompanyState gerencia o estado das empresas e notifica os widgets
-class CompanyState extends ChangeNotifier {
+class CompanyController with ChangeNotifier {
+  final _companiesCollection =
+      FirebaseFirestore.instance.collection('companies');
+  CompanyModel? _companyData;
+  bool _isLoading = true;
+
+  CompanyModel? get companyData => _companyData;
+  bool get isLoading => _isLoading;
+
+  Future<void> loadCompanyData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Usuário não autenticado');
+
+      final doc = await _companiesCollection.doc(user.uid).get();
+      if (!doc.exists) throw Exception('Empresa não encontrada');
+
+      _companyData = CompanyModel.fromJson(doc.data()!);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      Logger.logError('Erro ao carregar dados da empresa: $e');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateCompanyProfile({
+    required String name,
+    required String phoneNumber,
+    required String address,
+    required String about,
+    String? imageBase64,
+    required Map<String, dynamic> accessibilityData,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Usuário não autenticado');
+
+      await _companiesCollection.doc(user.uid).update({
+        'name': name,
+        'phoneNumber': phoneNumber,
+        'address': address,
+        'about': about,
+        if (imageBase64 != null) 'imageUrl': imageBase64,
+        'accessibilityData': accessibilityData,
+      });
+
+      await loadCompanyData(); // Recarrega os dados após atualização
+      return true;
+    } catch (e) {
+      Logger.logError('Erro ao atualizar perfil da empresa: $e');
+      return false;
+    }
+  }
+
   List<CompanyModel> _companies = [];
 
   List<CompanyModel> get companies => _companies;
@@ -16,11 +71,6 @@ class CompanyState extends ChangeNotifier {
     _companies = newCompanies;
     notifyListeners(); // Notifica as mudanças para os widgets
   }
-}
-
-class CompanyController {
-  final CollectionReference _companiesCollection =
-      FirebaseFirestore.instance.collection('companies');
 
   // Função para obter todas as empresas
   Future<List<CompanyModel>> getAllCompanies() async {
@@ -62,7 +112,7 @@ class CompanyController {
   // Função para inserir dados de mock no Firestore
   Future<void> insertMockCompanies() async {
     try {
-      for (var company in mockCompanies) {
+      for (var company in []) {
         await _companiesCollection.add(company.toJson());
       }
       Logger.logInfo('Dados de mock inseridos com sucesso!');
@@ -195,7 +245,7 @@ class CompanyController {
     try {
       // Obtém o email do usuário logado
       final userEmail =
-          Provider.of<AuthProvider>(context, listen: false).user?.email;
+          Provider.of<UserController>(context, listen: false).user?.email;
 
       String userName = 'Nome não encontrado';
 
@@ -231,7 +281,9 @@ class CompanyController {
 
       var commentData = {
         'userName': userName,
-        'userImage': 'https://via.placeholder.com/50.png?text=João',
+        'userImage': Provider.of<UserController>(context, listen: false)
+            .userModel
+            ?.profilePictureUrl,
         'text': comment,
         'date': DateTime.now().toString(),
         'rate': userRating,

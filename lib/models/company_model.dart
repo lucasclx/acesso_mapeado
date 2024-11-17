@@ -5,25 +5,28 @@ import 'package:uuid/uuid.dart';
 class CompanyModel {
   String uuid;
   String name;
-  double latitude;
-  double longitude;
+  String email;
+  String? fantasyName;
+  String cnpj;
+  double? latitude;
+  double? longitude;
   String address;
   String? imageUrl;
   double? rating;
   String? phoneNumber;
-  String? workingHours;
+  List<WorkingHours>? workingHours;
   AccessibilityModel? accessibilityData;
   List<CommentModel>? commentsData;
   List<double>? ratings;
-  String cnpj;
   String? registrationDate;
   String? about;
 
   static const _uuid = Uuid();
 
   CompanyModel({
-    String? uuid,
+    required this.uuid,
     required this.name,
+    required this.email,
     required this.latitude,
     required this.longitude,
     required this.address,
@@ -37,28 +40,31 @@ class CompanyModel {
     required this.cnpj,
     this.registrationDate,
     this.about,
-  }) : uuid = uuid ?? _uuid.v4();
+  });
 
   // Método factory para criar instâncias de CompanyModel a partir de um JSON
   factory CompanyModel.fromJson(Map<String, dynamic> json) {
     return CompanyModel(
-      uuid: json["uuid"] ?? _uuid.v4(),
+      uuid: json["uuid"],
       name: json['name'] ?? '',
-      latitude: (json['latitude'] as num).toDouble(),
-      longitude: (json['longitude'] as num).toDouble(),
+      email: json['email'] ?? '',
+      latitude: json['latitude'] != null
+          ? (json['latitude'] as num).toDouble()
+          : null,
+      longitude: json['longitude'] != null
+          ? (json['longitude'] as num).toDouble()
+          : null,
       address: json['address'] ?? '',
       imageUrl: json['imageUrl'],
       rating:
           json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       phoneNumber: json['phoneNumber'],
-      workingHours: json['workingHours'],
-      accessibilityData: json['accessibilityData'] != null &&
-              json['accessibilityData'] is Map<String, dynamic> &&
-              json['accessibilityData']['accessibilityData']
-                  is Map<String, dynamic>
-          ? AccessibilityModel.fromJson(
-              json['accessibilityData']['accessibilityData'])
+      workingHours: json['workingHours'] != null && json['workingHours'] is List
+          ? (json['workingHours'] as List)
+              .map((item) => WorkingHours.fromJson(item))
+              .toList()
           : null,
+      accessibilityData: AccessibilityModel.fromJson(json['accessibilityData']),
       commentsData: json['commentsData'] != null && json['commentsData'] is List
           ? (json['commentsData'] as List)
               .map((item) => CommentModel.fromJson(item))
@@ -79,13 +85,14 @@ class CompanyModel {
   Map<String, dynamic> toJson() => {
         'uuid': uuid,
         'name': name,
+        'email': email,
         'latitude': latitude,
         'longitude': longitude,
         'address': address,
         'imageUrl': imageUrl,
         'rating': rating,
         'phoneNumber': phoneNumber,
-        'workingHours': workingHours,
+        'workingHours': workingHours?.map((item) => item.toJson()).toList(),
         'accessibilityData': accessibilityData?.toJson(),
         'commentsData':
             commentsData?.map((comment) => comment.toJson()).toList(),
@@ -93,5 +100,27 @@ class CompanyModel {
         'cnpj': cnpj,
         'registrationDate': registrationDate,
         'about': about,
+      };
+}
+
+class WorkingHours {
+  final String day;
+  final String? open;
+  final String? close;
+
+  WorkingHours({required this.day, required this.open, required this.close});
+
+  factory WorkingHours.fromJson(Map<String, dynamic> json) {
+    return WorkingHours(
+      day: json['day'],
+      open: json['open'],
+      close: json['close'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'day': day,
+        'open': open,
+        'close': close,
       };
 }

@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:acesso_mapeado/controllers/auth_controller.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class ProfileUserPage extends StatefulWidget {
   const ProfileUserPage({super.key});
@@ -17,7 +19,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   // final ImagePicker _picker = ImagePicker();
   final imagePicker = ImagePicker();
-  final authController = AuthController();
+  final userController = UserController();
 
   // Future<void> _pickImage() async {
   //   final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -29,18 +31,41 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   //   }
   // }
 
+  final nameController = TextEditingController();
+  final birthDateController = TextEditingController();
+  final cpfController = TextEditingController();
+  final emailController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    birthDateController.dispose();
+    cpfController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
   pick(ImageSource source) async {
     final pickedFile = await imagePicker.pickImage(source: source);
 
     if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
+      if (mounted) {
+        Provider.of<UserController>(context, listen: false)
+            .updateProfilePhoto(File(pickedFile.path));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userModel = Provider.of<UserController>(context).userModel;
+    final imageUrl = userModel?.profilePictureUrl;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Padding(
@@ -57,12 +82,11 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       children: [
                         CircleAvatar(
                           radius: 60,
-                          backgroundImage: imageFile != null
-                              ? FileImage(
-                                  imageFile!) // Mostrar a imagem selecionada
+                          backgroundImage: imageUrl != null
+                              ? MemoryImage(base64Decode(imageUrl))
                               : const AssetImage(
                                       'assets/images/placeholder-user.png')
-                                  as ImageProvider, // Imagem padrão
+                                  as ImageProvider,
                         ),
                         Positioned(
                           bottom: 0,
@@ -88,6 +112,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ),
                   const SizedBox(height: 45),
                   TextFormField(
+                    controller: nameController,
                     decoration: const InputDecoration(
                         labelText: 'Nome',
                         border: OutlineInputBorder(),
@@ -96,6 +121,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: birthDateController,
                     decoration: const InputDecoration(
                         labelText: 'Data de nascimento',
                         border: OutlineInputBorder(),
@@ -105,6 +131,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: cpfController,
                     decoration: const InputDecoration(
                         labelText: 'CPF',
                         border: OutlineInputBorder(),
@@ -114,6 +141,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    controller: emailController,
                     decoration: const InputDecoration(
                         labelText: 'E-mail',
                         border: OutlineInputBorder(),
@@ -181,8 +209,13 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: () {
-                          authController.signOut();
-                          Navigator.pop(context);
+                          Provider.of<UserController>(context, listen: false)
+                              .logout();
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            'onboarding',
+                            (Route<dynamic> route) => false,
+                          );
                         },
                         child: const Text(
                           'Sair',
@@ -269,9 +302,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 onTap: () {
                   Navigator.of(context).pop();
                   // Tornar a foto null
-                  setState(() {
-                    imageFile = null;
-                  });
+                  if (mounted) {
+                    Provider.of<UserController>(context, listen: false)
+                        .removeProfilePhoto();
+                  }
                 },
               ),
             ],
