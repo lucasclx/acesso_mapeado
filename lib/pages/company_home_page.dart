@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';

@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/controllers/user_controller.dart';
+import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -198,6 +199,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final companyState = Provider.of<CompanyController>(context);
+    final userController = Provider.of<UserController>(context);
+    final user = userController.userModel;
     return Scaffold(
       appBar: homeAppBar(),
       backgroundColor: AppColors.white,
@@ -206,7 +209,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           _buildHomePage(companyState),
           _buildRankingPage(),
-           const ProfileUserPage(),
+          ProfileUserPage()
         ],
       ),
       drawer: homeDrawer(context),
@@ -216,7 +219,6 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 
   Drawer homeDrawer(BuildContext context) {
     return Drawer(
