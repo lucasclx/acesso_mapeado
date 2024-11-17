@@ -291,7 +291,7 @@ class _SignInPageState extends State<SignInPage> {
                       style: TextStyle(
                           color: AppColors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 18),
+                          fontSize: 16),
                     ),
                   ),
                   const SizedBox(height: 45),
