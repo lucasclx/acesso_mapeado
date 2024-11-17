@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
+import 'package:acesso_mapeado/pages/support_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -656,7 +657,27 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 ],
               ),
               const SizedBox(height: 45),
-              // Outras opções (redefinir senha, excluir conta, sair)
+              Row(
+                children: [
+                  const Icon(Icons.contact_support_outlined,
+                      color: AppColors.lightPurple),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SupportPage()));
+                    },
+                    child: const Text(
+                      'Suporte',
+                      style: TextStyle(
+                          color: AppColors.black,
+                          fontWeight: FontWeight.normal),
+                    ),
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   const Icon(Icons.lock_clock_outlined,

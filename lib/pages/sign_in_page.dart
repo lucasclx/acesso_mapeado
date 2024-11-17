@@ -32,14 +32,14 @@ class _SignInPageState extends State<SignInPage> {
       );
 
       if (user != null) {
-        // First check if it's a company account
+
         final companyData = await FirebaseFirestore.instance
             .collection('companies')
             .doc(user.uid)
             .get();
 
         if (companyData.exists) {
-          // It's a company account
+
           final companyModel = CompanyModel.fromJson(companyData.data()!);
           Provider.of<UserController>(context, listen: false)
               .updateCompanyModel(companyModel);
@@ -50,7 +50,7 @@ class _SignInPageState extends State<SignInPage> {
             (Route<dynamic> route) => false,
           );
         } else {
-          // It's a regular user account
+
           final userData = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
