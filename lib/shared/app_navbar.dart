@@ -18,28 +18,39 @@ class AppNavbar extends StatefulWidget {
 class _AppNavbarState extends State<AppNavbar> {
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      selectedItemColor: AppColors.lightPurple,
-      unselectedItemColor: AppColors.lightGray,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          backgroundColor: AppColors.white,
-          icon: Icon(Icons.map_outlined),
-          label: 'Início',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: AppColors.white,
-          icon: Icon(Icons.bar_chart_outlined),
-          label: 'Ranking',
-        ),
-        BottomNavigationBarItem(
-          backgroundColor: AppColors.white,
-          icon: Icon(Icons.person),
-          label: 'Perfil',
-        ),
-      ],
-      currentIndex: widget.selectedIndex,
-      onTap: widget.onItemTapped,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.darkGray.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: AppColors.white,
+        selectedItemColor: AppColors.lightPurple,
+        unselectedItemColor: AppColors.lightGray,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map_outlined),
+            label: 'Início',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart_outlined),
+            label: 'Ranking',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+        currentIndex: widget.selectedIndex,
+        onTap: widget.onItemTapped,
+      ),
     );
   }
 }
