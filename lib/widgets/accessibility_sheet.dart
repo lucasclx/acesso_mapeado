@@ -170,7 +170,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Center(
                   child: Image(
-                    image: NetworkImage(widget.companyModel.imageUrl!),
+                    image: NetworkImage(widget.companyModel.imageUrl ?? ''),
                     height: 150,
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
