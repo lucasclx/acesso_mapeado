@@ -22,7 +22,7 @@ class App extends StatelessWidget {
         'signUp': (context) => const SignUpPage(),
         'signIn': (context) => const SignInPage(),
         'home': (context) => const HomePage(),
-        'profile_user': (context) => const ProfileUserPage(),
+        'profile_user': (context) => ProfileUserPage(),
         'onboarding': (context) => const OnboardingPage(),
         'company_home': (context) => const CompanyHomePage(),
       },

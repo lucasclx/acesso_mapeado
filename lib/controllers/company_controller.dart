@@ -1,4 +1,4 @@
-import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

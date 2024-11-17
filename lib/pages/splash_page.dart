@@ -1,4 +1,4 @@
-import 'package:acesso_mapeado/controllers/auth_controller.dart';
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
