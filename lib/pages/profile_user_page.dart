@@ -260,40 +260,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
-  bool _isValidCpf(String cpf) {
-    cpf = cpf.replaceAll(RegExp(r'[^0-9]'), '');
-
-    if (cpf.length != 11) {
-      return false;
-    }
-
-    if (RegExp(r'^(\d)\1*$').hasMatch(cpf)) {
-      return false;
-    }
-
-    List<int> numbers = cpf.split('').map(int.parse).toList();
-
-    int sum = 0;
-    for (int i = 0; i < 9; i++) {
-      sum += numbers[i] * (10 - i);
-    }
-    int firstCheckDigit = (sum * 10 % 11) % 10;
-    if (numbers[9] != firstCheckDigit) {
-      return false;
-    }
-
-    sum = 0;
-    for (int i = 0; i < 10; i++) {
-      sum += numbers[i] * (11 - i);
-    }
-    int secondCheckDigit = (sum * 10 % 11) % 10;
-    if (numbers[10] != secondCheckDigit) {
-      return false;
-    }
-
-    return true;
-  }
-
   bool isValidDateOfBirth(String date) {
     try {
       final parts = date.split('/');
