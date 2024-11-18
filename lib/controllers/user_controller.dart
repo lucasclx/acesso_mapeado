@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -14,8 +17,18 @@ class UserController with ChangeNotifier {
   User? _user;
   UserModel? _userModel;
   CompanyModel? _companyModel;
+  LatLng? _userPosition;
 
   CompanyModel? get companyModel => _companyModel;
+
+  // getter
+  LatLng? get userPosition => _userPosition;
+
+  // setter
+  void setUserPosition(LatLng position) {
+    _userPosition = position;
+    notifyListeners();
+  }
 
   void updateCompanyModel(CompanyModel companyModel) {
     _companyModel = companyModel;
@@ -126,5 +139,40 @@ class UserController with ChangeNotifier {
     final companyDoc =
         await _firestore.collection('companies').doc(_user!.uid).get();
     _companyModel = CompanyModel.fromJson(companyDoc.data() ?? {});
+  }
+
+  // obter a localização do usuário
+  Future<bool> getUserLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      Logger.logInfo('Permissão de localização: $permission');
+
+      if (permission == LocationPermission.denied) {
+        Logger.logInfo('Solicitando permissão de localização...');
+
+        permission = await Geolocator.requestPermission();
+        Logger.logInfo('Permissão de localização: $permission');
+        
+        if (permission == LocationPermission.denied) {
+          Logger.logInfo('Permissão de localização negada');
+          return false;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        Logger.logInfo('Permissão de localização negada permanentemente');
+        return false;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      _userPosition = LatLng(position.latitude, position.longitude);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print('Erro ao obter a localização do usuário: $e');
+      return false;
+    }
   }
 }
