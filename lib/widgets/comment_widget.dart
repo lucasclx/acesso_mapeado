@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ class CommentWidget extends StatelessWidget {
   final String? text;
   final String? date;
   final double? rate;
+  final List<String>? photos;
 
   const CommentWidget({
     super.key,
@@ -16,6 +19,7 @@ class CommentWidget extends StatelessWidget {
     this.text,
     this.date,
     this.rate,
+    this.photos,
   });
 
   @override
@@ -84,6 +88,23 @@ class CommentWidget extends StatelessWidget {
               ),
             ],
           ),
+          if (photos != null && photos!.isNotEmpty)
+            SizedBox(
+                height: 75,
+                child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                    ),
+                    itemCount: photos!.length,
+                    itemBuilder: (context, index) {
+                      return AspectRatio(
+                        aspectRatio: 1.0,
+                        child: Image.memory(
+                          base64Decode(photos![index].split(',')[1]),
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    })),
           const Divider(color: AppColors.lightGray),
         ],
       ),

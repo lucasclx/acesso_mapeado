@@ -241,7 +241,7 @@ class CompanyController with ChangeNotifier {
 
   // Função que adiciona o comentário do usuario à empresa
   Future<bool> addUserComment(String companyUUID, String comment,
-      double userRating, BuildContext context) async {
+      double userRating, BuildContext context, List<String> photos) async {
     try {
       // Obtém o email do usuário logado
       final userEmail =
@@ -287,6 +287,7 @@ class CompanyController with ChangeNotifier {
         'text': comment,
         'date': DateTime.now().toString(),
         'rate': userRating,
+        // 'photos': photos,
       };
 
       commentsData.add(commentData);

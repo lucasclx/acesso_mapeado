@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
@@ -7,6 +9,7 @@ import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class RatePage extends StatefulWidget {
@@ -22,6 +25,7 @@ class _RatePageState extends State<RatePage> {
   final CompanyController _company = CompanyController();
   double _rating = 0;
   List<CompanyModel> companies = [];
+  final List<String> _selectedPhotos = [];
 
   bool sending = false;
   String userName = '';
@@ -29,6 +33,27 @@ class _RatePageState extends State<RatePage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _selectedPhotos.clear();
+    super.dispose();
+  }
+
+  Future<void> pickImages() async {
+    final imagePicker = ImagePicker();
+    List<XFile> images = await imagePicker.pickMultiImage(
+        maxHeight: 800.0, maxWidth: 800.0, imageQuality: 85);
+
+    if (images.isEmpty) return;
+    for (var image in images) {
+      final bytesImage = await image.readAsBytes();
+      final imageBase64 = base64Encode(bytesImage);
+      setState(() {
+        _selectedPhotos.add('data:image/jpeg;base64,$imageBase64');
+      });
+    }
   }
 
   // Função para adicionar comentário e avaliação
@@ -46,7 +71,7 @@ class _RatePageState extends State<RatePage> {
     });
 
     bool result = await _company.addUserComment(
-        widget.company.uuid, _comment.text, _rating, context);
+        widget.company.uuid, _comment.text, _rating, context, _selectedPhotos);
     bool ratingResult =
         await _company.addCompanyUserRating(widget.company.uuid, _rating);
     await getCompanies();
@@ -203,14 +228,59 @@ class _RatePageState extends State<RatePage> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: TextButton.icon(
-                onPressed: () {},
-                icon:
-                    const Icon(Icons.add_a_photo, color: AppColors.lightPurple),
-                label: const Text(
-                  'Adicionar foto',
-                  style: TextStyle(color: AppColors.lightPurple),
-                ),
+              child: Column(
+                children: [
+                  TextButton.icon(
+                    onPressed: pickImages,
+                    icon: const Icon(Icons.add_a_photo,
+                        color: AppColors.lightPurple),
+                    label: const Text(
+                      'Adicionar foto',
+                      style: TextStyle(color: AppColors.lightPurple),
+                    ),
+                  ),
+                  if (_selectedPhotos.isNotEmpty)
+                    Container(
+                      height: 150,
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _selectedPhotos.length,
+                          itemBuilder: (context, index) {
+                            return Stack(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Image.memory(
+                                    base64Decode(
+                                        _selectedPhotos[index].split(',')[1]),
+                                    fit: BoxFit.cover,
+                                    width: 150,
+                                    height: 180,
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  left: 2,
+                                  child: IconButton(
+                                    color: AppColors.white,
+                                    icon: Icon(Icons.close,
+                                        color: AppColors.red, size: 20),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedPhotos.removeAt(index);
+                                      });
+                                    },
+                                  ),
+                                )
+                              ],
+                            );
+                          }),
+                    )
+                ],
               ),
             ),
             Padding(

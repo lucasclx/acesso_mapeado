@@ -167,11 +167,15 @@ class UserController with ChangeNotifier {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
+
       _userPosition = LatLng(position.latitude, position.longitude);
       notifyListeners();
+
       return true;
     } catch (e) {
       print('Erro ao obter a localização do usuário: $e');
+
       return false;
     }
   }

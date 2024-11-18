@@ -366,12 +366,18 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                     CommentModel comment =
                         widget.companyModel.commentsData![index];
 
-                    return CommentWidget(
-                      userName: comment.userName,
-                      userImage: comment.userImage,
-                      text: comment.text,
-                      date: comment.date,
-                      rate: comment.rate,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CommentWidget(
+                          userName: comment.userName,
+                          userImage: comment.userImage,
+                          text: comment.text,
+                          date: comment.date,
+                          rate: comment.rate,
+                          photos: comment.photos,
+                        ),
+                      ],
                     );
                   },
                 ),
