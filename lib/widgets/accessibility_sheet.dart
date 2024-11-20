@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/comment_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
@@ -147,7 +145,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                             return Icon(
                               Icons.star,
                               color: index <
-                                      (widget.companyModel.rating?.floor() ?? 0)
+                                      (widget.companyModel.rating?.ceil() ?? 0)
                                   ? Colors.yellow
                                   : Colors.grey,
                               size: 20,
@@ -172,8 +170,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Center(
                   child: Image(
-                    image: MemoryImage(
-                        base64Decode(widget.companyModel.imageUrl ?? '')),
+                    image: NetworkImage(widget.companyModel.imageUrl ?? ''),
                     height: 150,
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
@@ -365,22 +362,22 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                   controller: scrollController,
                   itemCount: widget.companyModel.commentsData!.length,
                   itemBuilder: (context, index) {
-                    // Acessando diretamente um CommentModel
                     CommentModel comment =
                         widget.companyModel.commentsData![index];
 
                     return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CommentWidget(
-                            userName: comment.userName,
-                            userImage: comment.userImage,
-                            text: comment.text,
-                            date: comment.date,
-                            rate: comment.rate,
-                            photos: comment.photos,
-                          ),
-                        ]);
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CommentWidget(
+                          userName: comment.userName,
+                          userImage: comment.userImage,
+                          text: comment.text,
+                          date: comment.date,
+                          rate: comment.rate,
+                          photos: comment.photos,
+                        ),
+                      ],
+                    );
                   },
                 ),
 
@@ -397,6 +394,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                   ),
                 ),
               ),
+              //faça uma lista de 5 linhas onde cada linha será uma nota de 1 a 5, onde cada nota terá a quantidade de avaliacoes correspondentes
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

@@ -392,6 +392,61 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     );
   }
 
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            'Sair do Aplicativo',
+            style: TextStyle(
+              color: AppColors.black,
+            ),
+          ),
+          content: const Text(
+            'Deseja mesmo sair do aplicativo?',
+            style: TextStyle(fontSize: 16, color: AppColors.darkGray),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: AppColors.lightPurple,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Realizar logout e redirecionar
+                Provider.of<UserController>(context, listen: false).logout();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  'onboarding',
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: const Text(
+                'Sair',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildTextField(
     TextEditingController controller,
     String label,
@@ -702,7 +757,14 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       color: AppColors.lightPurple),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Para excluir a conta, entre em contato com o suporte.'),
+                        ),
+                      );
+                    },
                     child: const Text(
                       'Excluir conta',
                       style: TextStyle(
@@ -718,13 +780,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   const SizedBox(width: 8),
                   TextButton(
                     onPressed: () {
-                      Provider.of<UserController>(context, listen: false)
-                          .logout();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        'onboarding',
-                        (Route<dynamic> route) => false,
-                      );
+                      Provider.of<UserController>(context, listen: false);
+                      _showLogoutConfirmationDialog();
                     },
                     child: const Text(
                       'Sair',
