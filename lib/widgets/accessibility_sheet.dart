@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/comment_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
@@ -170,7 +172,8 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Center(
                   child: Image(
-                    image: NetworkImage(widget.companyModel.imageUrl ?? ''),
+                    image: MemoryImage(
+                        base64Decode(widget.companyModel.imageUrl ?? '')),
                     height: 150,
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {

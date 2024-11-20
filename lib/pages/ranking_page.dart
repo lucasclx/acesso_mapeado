@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
@@ -66,7 +68,7 @@ class _RankingPageState extends State<RankingPage> {
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage: company.imageUrl != null
-              ? NetworkImage(company.imageUrl!)
+              ? MemoryImage(base64Decode(company.imageUrl!.split(',')[1]))
               : const AssetImage('assets/images/img-company.png')
                   as ImageProvider,
           radius: 29,
