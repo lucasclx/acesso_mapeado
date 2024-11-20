@@ -14,7 +14,7 @@ class ImageZoomWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Zoom em Imagem')),
+      appBar: AppBar(),
       body: PhotoViewGallery.builder(
         itemCount: photos.length,
         builder: (context, index) {
