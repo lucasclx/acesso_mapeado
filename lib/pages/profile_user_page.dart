@@ -106,7 +106,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
   Future<void> pickImage(ImageSource source) async {
-    final pickedFile = await _imagePicker.pickImage(source: source);
+    final pickedFile = await _imagePicker.pickImage(
+        source: source, maxHeight: 150.0, maxWidth: 150.0, imageQuality: 85);
 
     if (pickedFile != null) {
       if (mounted) {
@@ -214,7 +215,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             children: [
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child:
+                      Icon(Icons.photo_library, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Galeria',
@@ -227,7 +229,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child: Icon(Icons.camera_alt, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Câmera',
@@ -240,7 +242,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child: Icon(Icons.delete, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Remover',

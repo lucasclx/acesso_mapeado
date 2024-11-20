@@ -255,9 +255,7 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
                     _buildActionButton(
                       'Acessibilidade',
                       Icons.accessibility_new,
-                      () {
-                        // TODO: Implementar gestão de acessibilidade
-                      },
+                      () {},
                     ),
                   ],
                 ),
