@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
@@ -259,7 +260,8 @@ class _HomePageState extends State<HomePage> {
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundImage: company.imageUrl != null
-                              ? NetworkImage(company.imageUrl!)
+                              ? MemoryImage(
+                                  base64Decode(company.imageUrl!.split(',')[1]))
                               : AssetImage('assets/images/img-company.png')
                                   as ImageProvider,
                           radius: 29,
