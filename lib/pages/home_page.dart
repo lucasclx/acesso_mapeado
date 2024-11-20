@@ -13,6 +13,7 @@ import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:acesso_mapeado/widgets/accessibility_sheet.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -24,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
+
   List<CompanyModel> filteredCompanies = [];
   @override
   void initState() {
@@ -37,6 +39,27 @@ class _HomePageState extends State<HomePage> {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
+  }
+
+  String calculateDistance(double? companyLatitude, double? companyLongitude) {
+    final userPosition =
+        Provider.of<UserController>(context, listen: false).userPosition;
+    if (userPosition == null ||
+        companyLatitude == null ||
+        companyLongitude == null) return "";
+    final distance = Geolocator.distanceBetween(
+      userPosition.latitude,
+      userPosition.longitude,
+      companyLatitude,
+      companyLongitude,
+    );
+
+    if (distance < 1000) {
+      return "${distance.toStringAsFixed(0)} m";
+    } else {
+      final distanceInKm = distance / 1000;
+      return "${distanceInKm.toStringAsFixed(0)} km";
+    }
   }
 
   Future<void> getCompanies() async {
@@ -220,7 +243,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Expanded(
           child: filteredCompanies.isEmpty // verificar se a lista está vazia
-              ? Center(
+              ? const Center(
                   child: Text(
                     'Nenhuma empresa encontrada.',
                     style: TextStyle(fontSize: 18, color: Colors.grey),
@@ -230,6 +253,8 @@ class _HomePageState extends State<HomePage> {
                   itemCount: filteredCompanies.length,
                   itemBuilder: (context, index) {
                     final company = filteredCompanies[index];
+                    final distance =
+                        calculateDistance(company.latitude, company.longitude);
                     return Card(
                       child: ListTile(
                         leading: CircleAvatar(
@@ -240,17 +265,24 @@ class _HomePageState extends State<HomePage> {
                           radius: 29,
                         ),
                         title: Text(company.name),
-                        subtitle: Row(
-                          children: List.generate(5, (starIndex) {
-                            return Icon(
-                              Icons.star,
-                              color: starIndex < (company.rating ?? 0)
-                                  ? Colors.yellow
-                                  : Colors.grey,
-                              size: 20,
-                            );
-                          }),
-                        ),
+                        subtitle: Row(children: [
+                          Row(
+                            children: List.generate(5, (starIndex) {
+                              return Icon(
+                                Icons.star,
+                                color: starIndex < (company.rating ?? 0)
+                                    ? Colors.yellow
+                                    : Colors.grey,
+                                size: 20,
+                              );
+                            }),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(
+                            distance,
+                            style: const TextStyle(color: AppColors.darkGray),
+                          ),
+                        ]),
                         trailing: Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: AppColors.lightPurple),

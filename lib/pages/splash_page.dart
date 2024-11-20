@@ -2,37 +2,53 @@ import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
-import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () async {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final userProfile =
-            await Provider.of<UserController>(context, listen: false)
-                .loadUserProfile();
-        if (userProfile != null) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomePage()));
-        } else {
-          await Provider.of<UserController>(context, listen: false)
-              .loadCompanyProfile();
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const CompanyHomePage()));
-        }
+  _SplashPageState createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    _initApp();
+  }
+
+  Future<void> _initApp() async {
+    final userController = Provider.of<UserController>(context, listen: false);
+
+    await userController.getUserLocation();
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final userProfile = await userController.loadUserProfile();
+      if (userProfile != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
       } else {
+        await userController.loadCompanyProfile();
         Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const OnboardingPage()));
+            MaterialPageRoute(builder: (context) => const CompanyHomePage()));
       }
-    });
+    } else {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const OnboardingPage()));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.veryLightPurple,
       body: Container(

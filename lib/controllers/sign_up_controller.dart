@@ -1,3 +1,4 @@
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:provider/provider.dart';
 
 class SignUpController {
   final GlobalKey<FormState> formKey;
@@ -203,7 +205,10 @@ class SignUpController {
         }).catchError((error) {
           Logger.logInfo('Erro ao adicionar usuário ao Firestore: $error');
         });
-
+        final userController =
+            Provider.of<UserController>(context, listen: false);
+        userController.setUser(user);
+        userController.updateUserModel(newUser);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),

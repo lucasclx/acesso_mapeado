@@ -356,7 +356,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
               if (widget.companyModel.commentsData != null &&
                   widget.companyModel.commentsData!.isNotEmpty)
                 ListView.builder(
-                  shrinkWrap: true, // Ajusta o tamanho conforme o conteúdo
+                  shrinkWrap: true,
                   physics:
                       const NeverScrollableScrollPhysics(), // Desabilita o scroll interno
                   controller: scrollController,
@@ -366,13 +366,18 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                     CommentModel comment =
                         widget.companyModel.commentsData![index];
 
-                    return CommentWidget(
-                      userName: comment.userName,
-                      userImage: comment.userImage,
-                      text: comment.text,
-                      date: comment.date,
-                      rate: comment.rate,
-                    );
+                    return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CommentWidget(
+                            userName: comment.userName,
+                            userImage: comment.userImage,
+                            text: comment.text,
+                            date: comment.date,
+                            rate: comment.rate,
+                            photos: comment.photos,
+                          ),
+                        ]);
                   },
                 ),
 
@@ -389,7 +394,6 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                   ),
                 ),
               ),
-              //faça uma lista de 5 linhas onde cada linha será uma nota de 1 a 5, onde cada nota terá a quantidade de avaliacoes correspondentes
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
