@@ -79,7 +79,7 @@ class CompanyController with ChangeNotifier {
           await FirebaseFirestore.instance.collection('companies').get();
 
       List<CompanyModel> companies = response.docs.map((doc) {
-        Logger.logInfo('Documento Firestore: ${doc.data()}');
+        Logger.logInfo('Lista de empresas');
         return CompanyModel.fromJson(doc.data());
       }).toList();
 
@@ -144,7 +144,7 @@ class CompanyController with ChangeNotifier {
       final docRef = await FirebaseFirestore.instance
           .collection('companies')
           .add(company.toJson());
-      Logger.logInfo('Document ID: ${docRef.id}');
+      // Logger.logInfo('Document ID: ${docRef.id}');
       return true;
     } catch (error) {
       Logger.logInfo('Error adding document: $error');
@@ -287,7 +287,7 @@ class CompanyController with ChangeNotifier {
         'text': comment,
         'date': DateTime.now().toString(),
         'rate': userRating,
-        // 'photos': photos,
+        'photos': photos,
       };
 
       commentsData.add(commentData);

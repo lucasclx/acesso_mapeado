@@ -4,7 +4,7 @@ class CommentModel {
   final String text;
   final String date;
   final double? rate;
-  final List<String>? photos; 
+  final List<String>? photos;
 
   CommentModel({
     required this.userName,
@@ -12,7 +12,7 @@ class CommentModel {
     required this.text,
     required this.date,
     this.rate = 0.0,
-    this.photos, 
+    this.photos,
   });
 
   // Método factory para criar instâcias de CommentModel a partir de um Json
@@ -23,7 +23,11 @@ class CommentModel {
       text: json["text"],
       date: json["date"],
       rate: (json["rate"] ?? 0.0).toDouble(),
-      photos: json["photos"] as List<String>?,
+      photos: json["photos"] != null
+          ? (json["photos"] as List<dynamic>)
+              .map((item) => item as String)
+              .toList()
+          : null,
     );
   }
 
