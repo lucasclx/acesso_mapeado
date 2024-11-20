@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:acesso_mapeado/widgets/image_zoom_widget.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 
@@ -33,9 +34,14 @@ class CommentWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage(
-                    userImage ?? 'assets/images/placeholder-user.png'),
-                radius: 20.0,
+                backgroundImage: userImage != null && userImage!.isNotEmpty
+                    ? MemoryImage(
+                        base64Decode(
+                            userImage!), // Converte a string base64 para bytes
+                      )
+                    : AssetImage('assets/images/placeholder-user.png')
+                        as ImageProvider,
+                radius: 25.0,
               ),
               const SizedBox(width: 10.0),
               Expanded(
@@ -47,7 +53,7 @@ class CommentWidget extends StatelessWidget {
                         Text(
                           userName ?? 'Nome do usuário não disponível',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: AppTypography.large,
                             fontWeight: FontWeight.bold,
                             color: AppColors.black,
                           ),
@@ -68,7 +74,10 @@ class CommentWidget extends StatelessWidget {
                     ),
                     ...[
                       if (text != null && text!.isNotEmpty)
-                        Text(text ?? 'Comentário não disponível'),
+                        Text(
+                          text ?? 'Comentário não disponível',
+                          style: TextStyle(fontSize: AppTypography.large),
+                        ),
                       const SizedBox(height: 4.0),
                     ],
                     Text(
@@ -90,21 +99,36 @@ class CommentWidget extends StatelessWidget {
           ),
           if (photos != null && photos!.isNotEmpty)
             SizedBox(
-                height: 75,
-                child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                    ),
-                    itemCount: photos!.length,
-                    itemBuilder: (context, index) {
-                      return AspectRatio(
-                        aspectRatio: 1.0,
-                        child: Image.memory(
-                          base64Decode(photos![index].split(',')[1]),
-                          fit: BoxFit.cover,
+              height: 150,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: AppSpacing.small,
+                  mainAxisSpacing: AppSpacing.small,
+                ),
+                itemCount: photos!.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ImageZoomWidget(
+                              photos: photos!, initialIndex: index),
                         ),
                       );
-                    })),
+                    },
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
+                      child: Image.memory(
+                        base64Decode(photos![index].split(',')[1]),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           const Divider(color: AppColors.lightGray),
         ],
       ),
