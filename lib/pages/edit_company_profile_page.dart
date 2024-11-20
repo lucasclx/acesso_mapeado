@@ -121,8 +121,8 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(
       source: source,
-      maxWidth: 800,
-      maxHeight: 800,
+      maxWidth: 500,
+      maxHeight: 500,
       imageQuality: 85,
     );
 

@@ -106,7 +106,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   }
 
   Future<void> pickImage(ImageSource source) async {
-    final pickedFile = await _imagePicker.pickImage(source: source);
+    final pickedFile = await _imagePicker.pickImage(
+        source: source, maxHeight: 150.0, maxWidth: 150.0, imageQuality: 85);
 
     if (pickedFile != null) {
       if (mounted) {
@@ -214,7 +215,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             children: [
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child:
+                      Icon(Icons.photo_library, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Galeria',
@@ -227,7 +229,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child: Icon(Icons.camera_alt, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Câmera',
@@ -240,7 +242,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200],
+                  child: Icon(Icons.delete, color: AppColors.lightPurple),
                 ),
                 title: Text(
                   'Remover',
@@ -381,6 +383,61 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppColors.lightPurple,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            'Sair do Aplicativo',
+            style: TextStyle(
+              color: AppColors.black,
+            ),
+          ),
+          content: const Text(
+            'Deseja mesmo sair do aplicativo?',
+            style: TextStyle(fontSize: 16, color: AppColors.darkGray),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: AppColors.lightPurple,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Realizar logout e redirecionar
+                Provider.of<UserController>(context, listen: false).logout();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  'onboarding',
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: const Text(
+                'Sair',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -700,7 +757,14 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                       color: AppColors.lightPurple),
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                              'Para excluir a conta, entre em contato com o suporte.'),
+                        ),
+                      );
+                    },
                     child: const Text(
                       'Excluir conta',
                       style: TextStyle(
@@ -716,13 +780,8 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                   const SizedBox(width: 8),
                   TextButton(
                     onPressed: () {
-                      Provider.of<UserController>(context, listen: false)
-                          .logout();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        'onboarding',
-                        (Route<dynamic> route) => false,
-                      );
+                      Provider.of<UserController>(context, listen: false);
+                      _showLogoutConfirmationDialog();
                     },
                     child: const Text(
                       'Sair',

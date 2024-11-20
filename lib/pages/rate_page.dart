@@ -44,7 +44,7 @@ class _RatePageState extends State<RatePage> {
   Future<void> pickImages() async {
     final imagePicker = ImagePicker();
     List<XFile> images = await imagePicker.pickMultiImage(
-        maxHeight: 800.0, maxWidth: 800.0, imageQuality: 85);
+        maxHeight: 500.0, maxWidth: 500.0, imageQuality: 85);
 
     if (images.isEmpty) return;
     for (var image in images) {
@@ -341,7 +341,7 @@ class _RatePageState extends State<RatePage> {
                 ),
               ],
             ),
-          ),    
+          ),
         ],
       ),
     );
