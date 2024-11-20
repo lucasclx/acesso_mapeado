@@ -30,6 +30,11 @@ class UserController with ChangeNotifier {
     notifyListeners();
   }
 
+  void setUser(User user) {
+    _user = user;
+    notifyListeners();
+  }
+
   void updateCompanyModel(CompanyModel companyModel) {
     _companyModel = companyModel;
     notifyListeners();
@@ -152,7 +157,7 @@ class UserController with ChangeNotifier {
 
         permission = await Geolocator.requestPermission();
         Logger.logInfo('Permissão de localização: $permission');
-        
+
         if (permission == LocationPermission.denied) {
           Logger.logInfo('Permissão de localização negada');
           return false;
@@ -167,7 +172,6 @@ class UserController with ChangeNotifier {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-
 
       _userPosition = LatLng(position.latitude, position.longitude);
       notifyListeners();
