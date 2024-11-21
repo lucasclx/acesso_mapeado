@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/comment_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
@@ -165,31 +167,44 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                 ),
               ),
               const SizedBox(height: 10.0),
-              // Imagem da Empresa
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Center(
-                  child: Image(
-                    image: NetworkImage(widget.companyModel.imageUrl ?? ''),
-                    height: 150,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      return Image.asset(
-                        'assets/images/img-company.png',
-                        height: 150,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/images/img-company.png',
-                        height: 150,
-                        fit: BoxFit.cover,
-                      );
-                    },
-                  ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Center(
+                        child: widget.companyModel.imageUrl != null &&
+                                widget.companyModel.imageUrl!.isNotEmpty &&
+                                widget.companyModel.imageUrl!.contains(',')
+                            ? Image.memory(
+                                base64Decode(
+                                  widget.companyModel.imageUrl!.split(',')[1],
+                                ),
+                                height: 150,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/img-company.png',
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'assets/images/img-company.png',
+                                height: 150,
+                                fit: BoxFit.cover,
+                              ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
+
+              // ...
               const SizedBox(height: 10.0),
               // Botões de Ação
               Padding(
