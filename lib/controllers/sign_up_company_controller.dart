@@ -42,7 +42,6 @@ class SignUpCompanyController {
 
     List<int> numbers = cnpj.split('').map(int.parse).toList();
 
-    // First check digit
     int sum = 0;
     int weight = 5;
     for (int i = 0; i < 12; i++) {
@@ -52,7 +51,6 @@ class SignUpCompanyController {
     int digit1 = sum % 11 < 2 ? 0 : 11 - (sum % 11);
     if (numbers[12] != digit1) return false;
 
-    // Second check digit
     sum = 0;
     weight = 6;
     for (int i = 0; i < 13; i++) {
@@ -70,9 +68,11 @@ class SignUpCompanyController {
   }
 
   Future<void> signUp(
-      BuildContext context,
-      Map<String, List<Map<String, dynamic>>> accessibilityData,
-      String address) async {
+    BuildContext context,
+    Map<String, List<Map<String, dynamic>>> accessibilityData,
+    String address,
+    Map<String, Map<String, String>> workingHoursData, // Novo parâmetro
+  ) async {
     if (formKey.currentState!.validate()) {
       if (!isValidPassword(passwordController.text)) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,10 +139,8 @@ class SignUpCompanyController {
           accessibilityData: selectedAccessibility,
         );
 
-        // Update the working hours implementation
         List<WorkingHours> workingHours = [];
 
-        // Get the working hours from the controllers
         for (String day in [
           'Segunda-feira',
           'Terça-feira',
@@ -216,25 +214,27 @@ class SignUpCompanyController {
   }
 }
 
-// Add this field to store working hours data
-final Map<String, Map<String, String>> workingHoursData = {};
-
-// Add this method to update working hours
-void updateWorkingHours(String day, String open, String close) {
-  workingHoursData[day] = {
-    'open': open,
-    'close': close,
-  };
-}
-
 Future<LatLng?> getLatLong(String address) async {
   final response = await Dio()
       .get('https://nominatim.openstreetmap.org/search?q=$address&format=json');
 
-  if (response.statusCode == 200) {
+  if (response.statusCode == 200 && response.data.isNotEmpty) {
     final data = response.data;
     return LatLng(double.parse(data[0]['lat']), double.parse(data[0]['lon']));
   } else {
     return null;
+  }
+}
+
+// Método de validação de CEP
+Future<bool> isValidCEP(String cep) async {
+  try {
+    final response = await Dio().get('https://viacep.com.br/ws/$cep/json/');
+    if (response.data.containsKey('erro') && response.data['erro'] == true) {
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
   }
 }

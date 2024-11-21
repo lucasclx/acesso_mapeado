@@ -1,9 +1,7 @@
 import 'package:acesso_mapeado/controllers/sign_up_company_controller.dart';
-import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class SignUpCompanyPage extends StatefulWidget {
@@ -19,6 +17,9 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   int _currentStep = 0;
   Map<String, TimeOfDay> _openingTimes = {};
   Map<String, TimeOfDay> _closingTimes = {};
+
+  // Flag para rastrear a validade do CEP
+  bool _isCEPValid = false;
 
   // Controllers para os campos do formulário
   final _nameController = TextEditingController();
@@ -57,7 +58,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     'Domingo': TextEditingController(),
   };
 
-  // Adicionar o accessibilityData como estado da página
+  // Dados de acessibilidade como estado da página
   final Map<String, List<Map<String, dynamic>>> accessibilityData = {
     "Acessibilidade Física": [
       {"tipo": "Rampas", "status": false},
@@ -104,11 +105,57 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     );
   }
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _cnpjController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _aboutController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _cepController.dispose();
+    _numberController.dispose();
+    _neighborhoodController.dispose();
+    _cityController.dispose();
+    _stateController.dispose();
+    _workingHoursController.dispose();
+    _openingTimeControllers.values
+        .forEach((controller) => controller.dispose());
+    _closingTimeControllers.values
+        .forEach((controller) => controller.dispose());
+    super.dispose();
+  }
+
   void _onStepContinue() {
-    if (_currentStep < 2) {
-      setState(() {
-        _currentStep++;
-      });
+    if (_formKey.currentState!.validate()) {
+      bool isValid = true;
+      for (String day in _openingTimeControllers.keys) {
+        String opening = _openingTimeControllers[day]!.text;
+        String closing = _closingTimeControllers[day]!.text;
+        if ((opening.isNotEmpty && closing.isEmpty) ||
+            (opening.isEmpty && closing.isNotEmpty)) {
+          isValid = false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Por favor, complete os horários de $day')),
+          );
+          break;
+        }
+      }
+
+      if (isValid) {
+        if (_currentStep < 2) {
+          setState(() {
+            _currentStep++;
+          });
+        }
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor, corrija os erros antes de continuar')),
+      );
     }
   }
 
@@ -122,8 +169,14 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
 
   Future<void> _selectTime(
       BuildContext context, String day, bool isOpening) async {
+    final TimeOfDay initialTime = isOpening
+        ? (_openingTimes[day] ?? const TimeOfDay(hour: 9, minute: 0))
+        : (_closingTimes[day] ?? const TimeOfDay(hour: 18, minute: 0));
+
     final TimeOfDay? picked = await showTimePicker(
-        context: context, initialTime: const TimeOfDay(hour: 0, minute: 0));
+      context: context,
+      initialTime: initialTime,
+    );
 
     if (picked != null) {
       setState(() {
@@ -136,6 +189,19 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
         }
       });
     }
+  }
+
+  void _clearWorkingHours() {
+    setState(() {
+      _openingTimes.clear();
+      _closingTimes.clear();
+      _openingTimeControllers.forEach((key, controller) {
+        controller.clear();
+      });
+      _closingTimeControllers.forEach((key, controller) {
+        controller.clear();
+      });
+    });
   }
 
   Widget _buildStepIndicator(int stepIndex, String stepName) {
@@ -175,6 +241,23 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     );
   }
 
+  // Método para converter os horários de funcionamento para o formato necessário
+  Map<String, Map<String, String>> _getWorkingHoursData() {
+    Map<String, Map<String, String>> data = {};
+    for (String day in _openingTimeControllers.keys) {
+      String open = _openingTimeControllers[day]!.text;
+      String close = _closingTimeControllers[day]!.text;
+
+      if (open.isNotEmpty || close.isNotEmpty) {
+        data[day] = {
+          'open': open.isNotEmpty ? open : 'Fechado',
+          'close': close.isNotEmpty ? close : 'Fechado',
+        };
+      }
+    }
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -196,10 +279,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
         ),
         leading: IconButton(
           icon: Image.asset('assets/icons/arrow-left.png'),
-          onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const OnboardingPage()),
-          ),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Form(
@@ -213,7 +293,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildStepIndicator(0, 'Dados empresariais'),
+                  _buildStepIndicator(0, 'Dados Empresariais'),
                   _buildStepLine(),
                   _buildStepIndicator(1, 'Endereço'),
                   _buildStepLine(),
@@ -258,11 +338,26 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                         const Spacer(),
                         if (_currentStep == 2)
                           ElevatedButton(
-                            onPressed: () => _controller.signUp(
-                              context,
-                              accessibilityData,
-                              '${_addressController.text}, ${_numberController.text} ${_cityController.text} - ${_stateController.text}',
-                            ),
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                // Coleta os dados de horários de funcionamento
+                                Map<String, Map<String, String>>
+                                    workingHoursData = _getWorkingHoursData();
+
+                                _controller.signUp(
+                                  context,
+                                  accessibilityData,
+                                  '${_addressController.text}, ${_numberController.text} ${_cityController.text} - ${_stateController.text}',
+                                  workingHoursData, // Passa os dados de horários
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Por favor, corrija os erros antes de concluir o cadastro')),
+                                );
+                              }
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.lightPurple,
                             ),
@@ -305,6 +400,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   Widget _buildStepCompanyDetails() {
     return Column(
       children: [
+        const SizedBox(height: 10),
         TextFormField(
           controller: _nameController,
           decoration: const InputDecoration(
@@ -314,7 +410,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                 EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           ),
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.trim().isEmpty) {
               return 'Por favor, insira o nome fantasia';
             }
             return null;
@@ -388,7 +484,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
           ),
           maxLines: 3,
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.trim().isEmpty) {
               return 'Por favor, insira uma descrição da empresa';
             }
             return null;
@@ -409,7 +505,11 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
               return 'Por favor, insira a senha';
             }
             if (!_controller.isValidPassword(value)) {
-              return 'A senha deve conter pelo menos 8 caracteres, incluindo maiúsculas, minúsculas, números e caracteres especiais';
+              return 'A senha deve conter no mínimo 8 caracteres, incluindo: '
+                  '\n- Uma letra maiúscula'
+                  '\n- Uma letra minúscula'
+                  '\n- Um número'
+                  '\n- Um caractere especial';
             }
             return null;
           },
@@ -452,59 +552,115 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
           ),
         ),
         const SizedBox(height: 10),
-        ..._openingTimeControllers.keys
-            .map((day) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(day, style: const TextStyle(fontSize: 14)),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => _selectTime(context, day, true),
-                            child: TextFormField(
-                              controller: _openingTimeControllers[day],
-                              decoration: InputDecoration(
-                                labelText: 'Abertura',
-                                border: const OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                hintText: _openingTimes[day]?.format(context) ??
-                                    'Selecione',
-                              ),
-                              enabled: false,
+        ..._openingTimeControllers.keys.map((day) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(day, style: const TextStyle(fontSize: 14)),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _selectTime(context, day, true),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: _openingTimeControllers[day],
+                          decoration: InputDecoration(
+                            labelText: 'Abertura',
+                            border: const OutlineInputBorder(),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
                             ),
+                            hintText: 'Opcional',
                           ),
+                          validator: (value) {
+                            String dayClosing =
+                                _closingTimeControllers[day]!.text;
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                dayClosing.isEmpty) {
+                              return 'Selecione o horário \n de fechamento';
+                            }
+                            return null;
+                          },
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () => _selectTime(context, day, false),
-                            child: TextFormField(
-                              controller: _closingTimeControllers[day],
-                              decoration: InputDecoration(
-                                labelText: 'Fechamento',
-                                border: const OutlineInputBorder(),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                hintText: _closingTimes[day]?.format(context) ??
-                                    'Selecione',
-                              ),
-                              enabled: false,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-                ))
-            .toList(),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _selectTime(context, day, false),
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          controller: _closingTimeControllers[day],
+                          decoration: InputDecoration(
+                            labelText: 'Fechamento',
+                            border: const OutlineInputBorder(),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            hintText: 'Opcional',
+                          ),
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              String dayOpening =
+                                  _openingTimeControllers[day]!.text;
+                              if (dayOpening.isEmpty) {
+                                return 'Selecione o horário \n de abertura primeiro';
+                              }
+
+                              // Converter os horários para minutos
+                              TimeOfDay? opening = _openingTimes[day];
+                              TimeOfDay? closing = _closingTimes[day];
+
+                              if (opening != null && closing != null) {
+                                final openingMinutes =
+                                    opening.hour * 60 + opening.minute;
+                                final closingMinutes =
+                                    closing.hour * 60 + closing.minute;
+                                if (closingMinutes <= openingMinutes) {
+                                  return 'Fechamento deve \n ser após a abertura';
+                                }
+                              }
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          );
+        }).toList(),
+        const SizedBox(height: 10),
+        Center(
+          child: ElevatedButton(
+            onPressed: _clearWorkingHours,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.white,
+              side: const BorderSide(
+                color: AppColors.lightPurple,
+                width: 2,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text(
+              'Limpar Horários',
+              style: TextStyle(
+                color: AppColors.lightPurple,
+                fontWeight: FontWeight.bold,
+                fontSize: AppTypography.small,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -512,6 +668,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   Widget _buildStepAddress() {
     return Column(
       children: [
+        const SizedBox(height: 10),
         TextFormField(
           controller: _cepController,
           decoration: const InputDecoration(
@@ -525,16 +682,47 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
             if (value == null || value.isEmpty) {
               return 'Por favor, insira o CEP';
             }
+            if (!_isCEPValid) {
+              return 'CEP inválido';
+            }
             return null;
           },
           onChanged: (value) async {
             if (value.length == 9) {
-              Map<String, dynamic> addressData = await getAddressData(value);
+              // Formato '00000-000'
+              try {
+                Map<String, dynamic> addressData =
+                    await getAddressData(value.replaceAll('-', ''));
+                if (addressData.containsKey('erro') &&
+                    addressData['erro'] == true) {
+                  setState(() {
+                    _isCEPValid = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('CEP não encontrado')),
+                  );
+                } else {
+                  setState(() {
+                    _isCEPValid = true;
+                    _addressController.text = addressData['logradouro'] ?? '';
+                    _neighborhoodController.text = addressData['bairro'] ?? '';
+                    _cityController.text = addressData['localidade'] ?? '';
+                    _stateController.text = addressData['uf'] ?? '';
+                  });
+                }
+              } catch (e) {
+                setState(() {
+                  _isCEPValid = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content:
+                          Text('Erro ao buscar o endereço. Verifique o CEP.')),
+                );
+              }
+            } else {
               setState(() {
-                _addressController.text = addressData['logradouro'];
-                _neighborhoodController.text = addressData['bairro'];
-                _cityController.text = addressData['localidade'];
-                _stateController.text = addressData['uf'];
+                _isCEPValid = false;
               });
             }
           },
@@ -636,7 +824,6 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
         ),
         const SizedBox(height: 20),
         ...accessibilityData.entries.map((entry) {
-          // Usar o accessibilityData do estado
           String category = entry.key;
           List<Map<String, dynamic>> items = entry.value;
           return ExpansionTile(
