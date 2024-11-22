@@ -27,7 +27,7 @@ class AppColors {
   static const Color red = Color(0xFFE53935);
 
   /// Um amarelo claro usado para destaques ou ícones.
-  static const Color yellow = Color(0xFFFDD835);
+  static const Color yellow = Color(0xFFFFC107);
 
   /// Um verde claro usado para destaques ou ícones.
   static const Color green = Color(0xFF4CAF50);
