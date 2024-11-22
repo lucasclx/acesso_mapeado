@@ -14,27 +14,15 @@ class AccessibilitySection extends StatelessWidget {
 
   IconData _getIconForTipo(String tipo) {
     Logger.logInfo('Tipo: $tipo');
-    switch (tipo.toLowerCase()) {
-      case 'banheiros':
-        return Icons.wc;
-      case 'estacionamento':
-        return Icons.local_parking;
-      case 'entradas':
-        return Icons.input;
-      case 'rampa':
-        return Icons.accessibility_new;
-      case 'elevador':
-        return Icons.vertical_align_center;
-      case 'porta automática':
-        return Icons.door_front_door;
-      case 'acessível':
-        return Icons.accessibility;
-      case 'sem barreiras':
-        return Icons.accessible_forward;
-      case 'sinalização em braile':
-        return Icons.text_fields;
-      case 'placas sonoras':
-        return Icons.volume_up;
+    switch (tipo) {
+      case 'Acessibilidade Sensorial':
+        return Icons.hearing;
+      case 'Acessibilidade Física':
+        return Icons.accessible;
+      case 'Acessibilidade Atitudinal':
+        return Icons.handshake_rounded;
+      case 'Acessibilidade Comunicacional':
+        return Icons.chat;
       default:
         return Icons.help_outline;
     }

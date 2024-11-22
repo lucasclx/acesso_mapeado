@@ -227,8 +227,9 @@ class _HomePageState extends State<HomePage> {
   // Métodos para construir cada página
   Widget _buildHomePage(CompanyController companyController) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 10),
+        const SizedBox(height: 14),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextField(
@@ -242,72 +243,73 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ),
+        const SizedBox(height: 10),
         Expanded(
-          child: filteredCompanies.isEmpty // verificar se a lista está vazia
+          child: filteredCompanies.isEmpty
               ? const Center(
                   child: Text(
                     'Nenhuma empresa encontrada.',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color.fromARGB(255, 225, 225, 225),
+                    ),
                   ),
                 )
               : ListView.builder(
                   itemCount: filteredCompanies.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemBuilder: (context, index) {
                     final company = filteredCompanies[index];
                     final distance =
                         calculateDistance(company.latitude, company.longitude);
+
                     return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      elevation: 4,
+                      margin: const EdgeInsets.only(bottom: 12.0),
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundImage: company.imageUrl != null
                               ? MemoryImage(
                                   base64Decode(company.imageUrl!.split(',')[1]))
-                              : AssetImage('assets/images/img-company.png')
+                              : const AssetImage(
+                                      'assets/images/img-company.png')
                                   as ImageProvider,
-                          radius: 29,
+                          radius: 25,
                         ),
-                        title: Text(company.name),
-                        subtitle: Row(children: [
-                          Row(
-                            children: List.generate(5, (starIndex) {
-                              return Icon(
-                                Icons.star,
-                                color: starIndex < (company.rating ?? 0)
-                                    ? Colors.yellow
-                                    : Colors.grey,
-                                size: 20,
-                              );
-                            }),
+                        title: Text(
+                          company.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
-                          const SizedBox(width: 16),
-                          Text(
-                            distance,
-                            style: const TextStyle(color: AppColors.darkGray),
-                          ),
-                        ]),
-                        trailing: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppColors.lightPurple),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.info,
-                                  color: AppColors.lightPurple,
-                                ),
-                                SizedBox(width: 5),
-                                Text(
-                                  'Saiba mais',
-                                  style:
-                                      TextStyle(color: AppColors.lightPurple),
-                                ),
-                              ],
+                        ),
+                        subtitle: Row(
+                          children: List.generate(5, (starIndex) {
+                            return Icon(
+                              Icons.star,
+                              color: starIndex < (company.rating ?? 0)
+                                  ? AppColors.yellow
+                                  : Colors.grey[300],
+                              size: AppTypography.xxLarge,
+                            );
+                          }),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              distance,
+                              style: const TextStyle(
+                                color: Color.fromARGB(255, 203, 5, 128),
+                                fontWeight: FontWeight.bold,
+                                fontSize: AppTypography.medium,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                         onTap: () {
                           _showAccessibilitySheet(company);
