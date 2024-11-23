@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
@@ -9,9 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 
 class EditCompanyProfilePage extends StatefulWidget {
@@ -167,10 +164,12 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
     _cepController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _openingTimeControllers.values
-        .forEach((controller) => controller.dispose());
-    _closingTimeControllers.values
-        .forEach((controller) => controller.dispose());
+    for (var controller in _openingTimeControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _closingTimeControllers.values) {
+      controller.dispose();
+    }
 
     // Dispose dos controladores locais
     _numberController.dispose();
@@ -626,7 +625,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
               const SizedBox(height: 20),
             ],
           );
-        }).toList(),
+        }),
         const SizedBox(height: 10),
         Center(
           child: ElevatedButton(
@@ -855,7 +854,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
               );
             }).toList(),
           );
-        }).toList(),
+        }),
       ],
     );
   }

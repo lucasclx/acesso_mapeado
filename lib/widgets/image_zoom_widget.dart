@@ -29,8 +29,8 @@ class ImageZoomWidget extends StatelessWidget {
             maxScale: PhotoViewComputedScale.covered * 2,
           );
         },
-        scrollPhysics: BouncingScrollPhysics(),
-        backgroundDecoration: BoxDecoration(color: Colors.black),
+        scrollPhysics: const BouncingScrollPhysics(),
+        backgroundDecoration: const BoxDecoration(color: Colors.black),
         pageController: PageController(initialPage: initialIndex),
       ),
     );

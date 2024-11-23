@@ -39,7 +39,7 @@ class CommentWidget extends StatelessWidget {
                         base64Decode(
                             userImage!), // Converte a string base64 para bytes
                       )
-                    : AssetImage('assets/images/placeholder-user.png')
+                    : const AssetImage('assets/images/placeholder-user.png')
                         as ImageProvider,
                 radius: 25.0,
               ),
@@ -76,7 +76,7 @@ class CommentWidget extends StatelessWidget {
                       if (text != null && text!.isNotEmpty)
                         Text(
                           text ?? 'Comentário não disponível',
-                          style: TextStyle(fontSize: AppTypography.large),
+                          style: const TextStyle(fontSize: AppTypography.large),
                         ),
                       const SizedBox(height: 4.0),
                     ],
@@ -101,7 +101,7 @@ class CommentWidget extends StatelessWidget {
             SizedBox(
               height: 150,
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: AppSpacing.small,
                   mainAxisSpacing: AppSpacing.small,

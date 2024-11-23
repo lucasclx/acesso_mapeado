@@ -1,14 +1,14 @@
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
-import 'package:acesso_mapeado/shared/mock_data.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/controllers/sign_up_controller.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+  const SignUpPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPageState createState() => _SignUpPageState();
 }
 

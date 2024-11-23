@@ -15,8 +15,8 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
   final _formKey = GlobalKey<FormState>();
   late SignUpCompanyController _controller;
   int _currentStep = 0;
-  Map<String, TimeOfDay> _openingTimes = {};
-  Map<String, TimeOfDay> _closingTimes = {};
+  final Map<String, TimeOfDay> _openingTimes = {};
+  final Map<String, TimeOfDay> _closingTimes = {};
 
   // Flag para rastrear a validade do CEP
   bool _isCEPValid = false;
@@ -121,10 +121,12 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
     _cityController.dispose();
     _stateController.dispose();
     _workingHoursController.dispose();
-    _openingTimeControllers.values
-        .forEach((controller) => controller.dispose());
-    _closingTimeControllers.values
-        .forEach((controller) => controller.dispose());
+    for (var controller in _openingTimeControllers.values) {
+      controller.dispose();
+    }
+    for (var controller in _closingTimeControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -566,10 +568,10 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                       child: AbsorbPointer(
                         child: TextFormField(
                           controller: _openingTimeControllers[day],
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Abertura',
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.symmetric(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 10,
                             ),
@@ -596,10 +598,10 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
                       child: AbsorbPointer(
                         child: TextFormField(
                           controller: _closingTimeControllers[day],
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Fechamento',
-                            border: const OutlineInputBorder(),
-                            contentPadding: const EdgeInsets.symmetric(
+                            border: OutlineInputBorder(),
+                            contentPadding: EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 10,
                             ),
@@ -638,7 +640,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
               const SizedBox(height: 20),
             ],
           );
-        }).toList(),
+        }),
         const SizedBox(height: 10),
         Center(
           child: ElevatedButton(
@@ -852,7 +854,7 @@ class _SignUpCompanyPageState extends State<SignUpCompanyPage> {
               );
             }).toList(),
           );
-        }).toList(),
+        }),
       ],
     );
   }
