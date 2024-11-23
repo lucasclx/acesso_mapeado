@@ -1,8 +1,12 @@
+import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/controllers/sign_up_controller.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -27,6 +31,9 @@ class _SignUpPageState extends State<SignUpPage> {
       dateOfBirthController: MaskedTextController(mask: '00/00/0000'),
       passwordController: TextEditingController(),
       confirmPasswordController: TextEditingController(),
+      userController: Provider.of<UserController>(context, listen: false),
+      auth: FirebaseAuth.instance,
+      firestore: FirebaseFirestore.instance,
     );
   }
 

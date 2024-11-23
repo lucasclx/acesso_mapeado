@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
@@ -17,7 +19,10 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage> {
-  final CompanyController _companyController = CompanyController();
+  final CompanyController _companyController = CompanyController(
+    auth: FirebaseAuth.instance,
+    firestore: FirebaseFirestore.instance,
+  );
   List<CompanyModel> rankedCompanies = [];
   bool _isLoading = true;
 

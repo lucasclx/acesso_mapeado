@@ -6,6 +6,8 @@ import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,7 +23,10 @@ class RatePage extends StatefulWidget {
 
 class _RatePageState extends State<RatePage> {
   final TextEditingController _comment = TextEditingController();
-  final CompanyController _company = CompanyController();
+  final CompanyController _company = CompanyController(
+    auth: FirebaseAuth.instance,
+    firestore: FirebaseFirestore.instance,
+  );
   double _rating = 0;
   List<CompanyModel> companies = [];
   final List<String> _selectedPhotos = [];

@@ -11,6 +11,9 @@ coverage/
 *.cmake
 
 # Arquivos iOS/XCode relacionados
+Debug.xcconfig
+Release.xcconfig
+Podfile
 **/ios/**/*.mode1v3
 **/ios/**/*.mode2v3
 **/ios/**/*.moved-aside

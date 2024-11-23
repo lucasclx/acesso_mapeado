@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
@@ -159,7 +161,10 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  final CompanyController _companyController = CompanyController();
+  final CompanyController _companyController = CompanyController(
+    auth: FirebaseAuth.instance,
+    firestore: FirebaseFirestore.instance,
+  );
 
   int _selectedIndex = 0;
 

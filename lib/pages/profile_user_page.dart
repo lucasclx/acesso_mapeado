@@ -26,7 +26,10 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   late MaskedTextController _dateOfBirthController;
   late MaskedTextController cpfController;
   late TextEditingController emailController;
-  final UserController _authService = UserController();
+  final UserController _authService = UserController(
+    auth: FirebaseAuth.instance,
+    firestore: FirebaseFirestore.instance,
+  );
 
   bool _isLoading = false;
   int _currentStep = 0; // Variável para controlar o passo atual
@@ -290,14 +293,49 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       return;
     }
 
-    try {
-      await _authService.resetPassword(email);
-      _showSuccessDialog('E-mail de redefinição de senha enviado com sucesso!');
-    } on FirebaseAuthException catch (e) {
-      _showErrorDialog('Erro ao tentar redefinir a senha: ${e.message}');
-    } catch (e) {
-      _showErrorDialog('Erro desconhecido: ${e.toString()}');
-    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text('Confirmar redefinição de senha'),
+          content:
+              const Text('Deseja enviar um e-mail de redefinição de senha?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: AppColors.darkGray),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await _authService.resetPassword(email);
+                  _showSuccessDialog(
+                      'E-mail de redefinição de senha enviado com sucesso!');
+                } on FirebaseAuthException catch (e) {
+                  _showErrorDialog(
+                      'Erro ao tentar redefinir a senha: ${e.message}');
+                } catch (e) {
+                  _showErrorDialog('Erro desconhecido: ${e.toString()}');
+                }
+              },
+              child: const Text(
+                'Confirmar',
+                style: TextStyle(color: AppColors.lightPurple),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showSuccessDialog(String message) {

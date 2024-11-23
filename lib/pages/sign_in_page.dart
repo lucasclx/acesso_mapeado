@@ -23,11 +23,14 @@ class _SignInPageState extends State<SignInPage> {
   bool _isPasswordVisible = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final UserController _authService = UserController();
+  final UserController _userController = UserController(
+    auth: FirebaseAuth.instance,
+    firestore: FirebaseFirestore.instance,
+  );
 
   Future<void> _signIn() async {
     try {
-      final user = await _authService.signIn(
+      final user = await _userController.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
@@ -40,28 +43,32 @@ class _SignInPageState extends State<SignInPage> {
 
         if (companyData.exists) {
           final companyModel = CompanyModel.fromJson(companyData.data()!);
-          Provider.of<UserController>(context, listen: false)
-              .updateCompanyModel(companyModel);
+          if (mounted) {
+            Provider.of<UserController>(context, listen: false)
+                .updateCompanyModel(companyModel);
 
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const CompanyHomePage()),
-            (Route<dynamic> route) => false,
-          );
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const CompanyHomePage()),
+              (Route<dynamic> route) => false,
+            );
+          }
         } else {
           final userData = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
               .get();
           final userModel = UserModel.fromJson(userData.data()!);
-          Provider.of<UserController>(context, listen: false)
-              .updateUserModel(userModel);
+          if (mounted) {
+            Provider.of<UserController>(context, listen: false)
+                .updateUserModel(userModel);
 
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-            (Route<dynamic> route) => false,
-          );
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (Route<dynamic> route) => false,
+            );
+          }
         }
       }
     } on Exception catch (e) {
@@ -133,7 +140,7 @@ class _SignInPageState extends State<SignInPage> {
         return;
       }
 
-      await _authService.resetPassword(email);
+      await _userController.resetPassword(email);
       _showSuccessDialog('E-mail de redefinição de senha enviado com sucesso!');
     } on FirebaseAuthException catch (e) {
       Logger.logError('Erro ao tentar redefinir a senha: $e');
