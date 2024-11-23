@@ -6,7 +6,7 @@ void main() {
   testWidgets('Verifica se os elementos da Onboarding Page estão presentes',
       (WidgetTester tester) async {
     // Renderiza a Onboarding Page no ambiente de teste
-    await tester.pumpWidget(MaterialApp(home: OnboardingPage()));
+    await tester.pumpWidget(const MaterialApp(home: OnboardingPage()));
 
     // Verifica se o título principal está presente
     expect(find.text('Cadastre-se'), findsOneWidget);

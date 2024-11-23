@@ -6,7 +6,6 @@ import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -169,7 +168,7 @@ class _RatePageState extends State<RatePage> {
                   padding: const EdgeInsets.all(10),
                   child: Row(
                     children: [
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -254,7 +253,7 @@ class _RatePageState extends State<RatePage> {
                                 return Stack(
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.all(8),
+                                      padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -286,11 +285,11 @@ class _RatePageState extends State<RatePage> {
                                                 color: AppColors.black
                                                     .withOpacity(0.2),
                                                 blurRadius: 10,
-                                                offset: Offset(0, 5),
+                                                offset: const Offset(0, 5),
                                               ),
                                             ],
                                           ),
-                                          child: Center(
+                                          child: const Center(
                                             child: Icon(
                                               Icons.close,
                                               color: AppColors.white,

@@ -1,10 +1,9 @@
-import 'package:acesso_mapeado/pages/profile_user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:url_launcher/url_launcher.dart'; // Importando o url_launcher
 
 class SupportPage extends StatefulWidget {
-  const SupportPage({Key? key}) : super(key: key);
+  const SupportPage({super.key});
 
   @override
   State<SupportPage> createState() => _SupportPageState();
@@ -28,8 +27,8 @@ class _SupportPageState extends State<SupportPage> {
       String url =
           'https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}';
 
-      if (await canLaunch(url)) {
-        await launch(url);
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(Uri.parse(url));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Não foi possível abrir o WhatsApp.')),

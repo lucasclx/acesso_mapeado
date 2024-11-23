@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:acesso_mapeado/shared/mock_companies.dart';
 import 'package:provider/provider.dart';
 
 class CompanyController with ChangeNotifier {
@@ -100,7 +99,7 @@ class CompanyController with ChangeNotifier {
 
       List<CompanyModel> companies = querySnapshot.docs
           .map((doc) =>
-              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+              CompanyModel.fromJson(doc.data()))
           .toList();
       return companies;
     } catch (e) {
@@ -129,7 +128,7 @@ class CompanyController with ChangeNotifier {
 
       List<CompanyModel> companies = response.docs
           .map((doc) =>
-              CompanyModel.fromJson(doc.data() as Map<String, dynamic>))
+              CompanyModel.fromJson(doc.data()))
           .toList();
       return companies;
     } catch (e) {
@@ -141,9 +140,6 @@ class CompanyController with ChangeNotifier {
   // Função que cria a empresa
   Future<bool> createCompany(CompanyModel company) async {
     try {
-      final docRef = await FirebaseFirestore.instance
-          .collection('companies')
-          .add(company.toJson());
       // Logger.logInfo('Document ID: ${docRef.id}');
       return true;
     } catch (error) {

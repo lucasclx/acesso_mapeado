@@ -6,6 +6,7 @@ import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/pages/sign_up_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -32,14 +33,12 @@ class _SignInPageState extends State<SignInPage> {
       );
 
       if (user != null) {
-
         final companyData = await FirebaseFirestore.instance
             .collection('companies')
             .doc(user.uid)
             .get();
 
         if (companyData.exists) {
-
           final companyModel = CompanyModel.fromJson(companyData.data()!);
           Provider.of<UserController>(context, listen: false)
               .updateCompanyModel(companyModel);
@@ -50,7 +49,6 @@ class _SignInPageState extends State<SignInPage> {
             (Route<dynamic> route) => false,
           );
         } else {
-
           final userData = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
@@ -126,6 +124,7 @@ class _SignInPageState extends State<SignInPage> {
 
     try {
       final methods =
+          // ignore: deprecated_member_use
           await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
 
       if (methods.isEmpty) {
@@ -137,6 +136,7 @@ class _SignInPageState extends State<SignInPage> {
       await _authService.resetPassword(email);
       _showSuccessDialog('E-mail de redefinição de senha enviado com sucesso!');
     } on FirebaseAuthException catch (e) {
+      Logger.logError('Erro ao tentar redefinir a senha: $e');
       _showErrorDialog(
           'Erro ao tentar redefinir a senha. Tente novamente mais tarde.');
     } catch (e) {

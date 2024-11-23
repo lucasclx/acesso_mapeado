@@ -77,6 +77,7 @@ class UserController with ChangeNotifier {
       _user = userCredential.user;
       return _user;
     } on FirebaseAuthException catch (e) {
+      Logger.logError('Erro ao realizar o login: $e');
       throw Exception('Erro ao realizar o login.');
     }
   }
@@ -170,7 +171,9 @@ class UserController with ChangeNotifier {
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       _userPosition = LatLng(position.latitude, position.longitude);
@@ -178,7 +181,7 @@ class UserController with ChangeNotifier {
 
       return true;
     } catch (e) {
-      print('Erro ao obter a localização do usuário: $e');
+      Logger.logError('Erro ao obter a localização do usuário: $e');
 
       return false;
     }

@@ -278,7 +278,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                       zoomControlsEnabled: false,
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     height: mapHeight,
                     width: MediaQuery.of(context).size.width,
                     child: GestureDetector(
@@ -483,8 +483,7 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
                             ),
                           ),
                           TextSpan(
-                            text: widget.companyModel.cnpj ??
-                                'CNPJ não disponível',
+                            text: widget.companyModel.cnpj,
                             style: const TextStyle(
                               fontSize: AppSpacing.medium,
                               color: AppColors.black,

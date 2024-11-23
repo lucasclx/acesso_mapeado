@@ -1,6 +1,5 @@
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/comment_model.dart';
-import 'package:uuid/uuid.dart';
 
 class CompanyModel {
   String uuid;
@@ -20,8 +19,6 @@ class CompanyModel {
   List<double>? ratings;
   String? registrationDate;
   String? about;
-
-  static const _uuid = Uuid();
 
   CompanyModel({
     required this.uuid,

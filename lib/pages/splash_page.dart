@@ -3,7 +3,6 @@ import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
-import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SplashPageState createState() => _SplashPageState();
 }
 

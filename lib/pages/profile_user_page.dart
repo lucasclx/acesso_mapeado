@@ -13,7 +13,7 @@ import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:intl/intl.dart';
 
 class ProfileUserPage extends StatefulWidget {
-  ProfileUserPage({super.key});
+  const ProfileUserPage({super.key});
 
   @override
   State<ProfileUserPage> createState() => _ProfileUserPageState();
@@ -29,7 +29,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   final UserController _authService = UserController();
 
   bool _isLoading = false;
-  String? _imageBase64;
   int _currentStep = 0; // Variável para controlar o passo atual
 
   // Dados de acessibilidade
@@ -68,7 +67,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     _dateOfBirthController = MaskedTextController(
       mask: '00/00/0000',
       text: user?.dateOfBirth != null
-          ? DateFormat('dd/MM/yyyy').format(user!.dateOfBirth!)
+          ? DateFormat('dd/MM/yyyy').format(user!.dateOfBirth)
           : '',
     );
     cpfController = MaskedTextController(
@@ -76,7 +75,6 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
       text: user?.cpf ?? '',
     );
     emailController = TextEditingController(text: user?.email ?? '');
-    _imageBase64 = user?.profilePictureUrl;
 
     if (user?.accessibilityData != null) {
       final userAccessibilityData = user!.accessibilityData!.toJson();
@@ -86,7 +84,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
           for (var item in userAccessibilityData[category]) {
             final matchingItem = accessibilityData[category]?.firstWhere(
                 (element) => element['tipo'] == item['tipo'],
-                orElse: () => Map<String, dynamic>());
+                orElse: () => <String, dynamic>{});
             if (matchingItem != null) {
               matchingItem['status'] = item['status'];
             }
@@ -214,7 +212,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: CircleAvatar(
+                leading: const CircleAvatar(
                   child:
                       Icon(Icons.photo_library, color: AppColors.lightPurple),
                 ),
@@ -228,7 +226,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 },
               ),
               ListTile(
-                leading: CircleAvatar(
+                leading: const CircleAvatar(
                   child: Icon(Icons.camera_alt, color: AppColors.lightPurple),
                 ),
                 title: Text(
@@ -241,7 +239,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
                 },
               ),
               ListTile(
-                leading: CircleAvatar(
+                leading: const CircleAvatar(
                   child: Icon(Icons.delete, color: AppColors.lightPurple),
                 ),
                 title: Text(
@@ -607,7 +605,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               );
             }).toList(),
           );
-        }).toList(),
+        }),
       ],
     );
   }

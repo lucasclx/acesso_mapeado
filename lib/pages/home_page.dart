@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:acesso_mapeado/controllers/user_controller.dart';
-import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:acesso_mapeado/shared/mock_data.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:acesso_mapeado/controllers/company_controller.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/pages/profile_user_page.dart';
 import 'package:acesso_mapeado/pages/ranking_page.dart';
-import 'package:acesso_mapeado/pages/sign_in_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
 import 'package:acesso_mapeado/shared/app_navbar.dart';
 import 'package:acesso_mapeado/widgets/accessibility_sheet.dart';
@@ -79,56 +76,6 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao carregar empresas.')),
-      );
-    }
-  }
-
-  // Função para inserir dados de mock
-  Future<void> _insertMockData() async {
-    try {
-      await _companyController.insertMockCompanies();
-
-      if (!mounted) return;
-
-      // Recarregar as empresas após a inserção
-      await getCompanies();
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dados de mock inseridos com sucesso!')),
-      );
-    } catch (e) {
-      Logger.logError('Erro ao inserir dados de mock: $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao inserir dados de mock.')),
-      );
-    }
-  }
-
-  // Função para remover todas as empresas (opcional)
-  Future<void> _removeAllCompanies() async {
-    try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('companies').get();
-      for (var doc in snapshot.docs) {
-        await doc.reference.delete();
-      }
-
-      if (!mounted) return;
-
-      setState(() {
-        companies.clear();
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Todas as empresas foram removidas!')),
-      );
-    } catch (e) {
-      Logger.logError('Erro ao remover empresas: $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao remover empresas.')),
       );
     }
   }
@@ -330,8 +277,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final companyState = Provider.of<CompanyController>(context);
-    final userController = Provider.of<UserController>(context);
-    final user = userController.userModel;
     return Scaffold(
       appBar: homeAppBar(),
       backgroundColor: AppColors.white,
@@ -340,7 +285,7 @@ class _HomePageState extends State<HomePage> {
         children: [
           _buildHomePage(companyState),
           _buildRankingPage(),
-          ProfileUserPage()
+          const ProfileUserPage()
         ],
       ),
       drawer: _selectedIndex == 0 ? homeDrawer(context) : null,

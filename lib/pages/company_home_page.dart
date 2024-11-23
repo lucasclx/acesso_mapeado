@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:acesso_mapeado/controllers/user_controller.dart';
-import 'package:acesso_mapeado/controllers/company_controller.dart';
-import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+import 'package:acesso_mapeado/shared/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +58,7 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
   @override
   Widget build(BuildContext context) {
     final accessibilityData = companyData?.accessibilityData?.accessibilityData;
-    print(accessibilityData);
+    Logger.logInfo('accessibilityData: $accessibilityData');
     if (isLoading) {
       return const Scaffold(
         body: Center(
