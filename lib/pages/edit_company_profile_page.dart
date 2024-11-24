@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:acesso_mapeado/models/accessibility_model.dart';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
@@ -699,9 +700,12 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                   setState(() {
                     _isCEPValid = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('CEP não encontrado')),
-                  );
+
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('CEP não encontrado')),
+                    );
+                  }
                 } else {
                   setState(() {
                     _isCEPValid = true;
@@ -715,11 +719,13 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
                 setState(() {
                   _isCEPValid = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content:
-                          Text('Erro ao buscar o endereço. Verifique o CEP.')),
-                );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text(
+                            'Erro ao buscar o endereço. Verifique o CEP.')),
+                  );
+                }
               }
             } else {
               setState(() {

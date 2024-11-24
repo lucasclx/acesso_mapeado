@@ -67,6 +67,7 @@ class OnboardingPage extends StatelessWidget {
                   ),
                   child: const Text(
                     'Entrar',
+                    key: Key('entrar_button'),
                     style: TextStyle(color: AppColors.white),
                   ),
                 ),

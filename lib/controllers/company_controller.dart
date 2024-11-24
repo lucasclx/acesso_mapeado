@@ -7,8 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 class CompanyController with ChangeNotifier {
-  final _companiesCollection =
-      FirebaseFirestore.instance.collection('companies');
+  CompanyController({
+    required this.auth,
+    required this.firestore,
+  }) {
+    _companiesCollection = firestore.collection('companies');
+  }
+
+  late final FirebaseAuth auth;
+  late final FirebaseFirestore firestore;
+  late CollectionReference<Map<String, dynamic>> _companiesCollection;
+
   CompanyModel? _companyData;
   bool _isLoading = true;
 
@@ -17,7 +26,7 @@ class CompanyController with ChangeNotifier {
 
   Future<void> loadCompanyData() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = auth.currentUser;
       if (user == null) throw Exception('Usuário não autenticado');
 
       final doc = await _companiesCollection.doc(user.uid).get();
@@ -42,7 +51,7 @@ class CompanyController with ChangeNotifier {
     required Map<String, dynamic> accessibilityData,
   }) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = auth.currentUser;
       if (user == null) throw Exception('Usuário não autenticado');
 
       await _companiesCollection.doc(user.uid).update({
@@ -74,8 +83,7 @@ class CompanyController with ChangeNotifier {
   // Função para obter todas as empresas
   Future<List<CompanyModel>> getAllCompanies() async {
     try {
-      final response =
-          await FirebaseFirestore.instance.collection('companies').get();
+      final response = await _companiesCollection.get();
 
       List<CompanyModel> companies = response.docs.map((doc) {
         Logger.logInfo('Lista de empresas');
@@ -98,8 +106,7 @@ class CompanyController with ChangeNotifier {
           .get();
 
       List<CompanyModel> companies = querySnapshot.docs
-          .map((doc) =>
-              CompanyModel.fromJson(doc.data()))
+          .map((doc) => CompanyModel.fromJson(doc.data()))
           .toList();
       return companies;
     } catch (e) {
@@ -127,8 +134,7 @@ class CompanyController with ChangeNotifier {
           await _companiesCollection.orderBy('rating', descending: true).get();
 
       List<CompanyModel> companies = response.docs
-          .map((doc) =>
-              CompanyModel.fromJson(doc.data()))
+          .map((doc) => CompanyModel.fromJson(doc.data()))
           .toList();
       return companies;
     } catch (e) {
@@ -140,7 +146,7 @@ class CompanyController with ChangeNotifier {
   // Função que cria a empresa
   Future<bool> createCompany(CompanyModel company) async {
     try {
-      // Logger.logInfo('Document ID: ${docRef.id}');
+      await _companiesCollection.add(company.toJson());
       return true;
     } catch (error) {
       Logger.logInfo('Error adding document: $error');

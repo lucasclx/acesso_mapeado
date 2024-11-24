@@ -4,15 +4,26 @@ import 'dart:io';
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  UserController({
+    required this.auth,
+    required this.firestore,
+  }) {
+    _user = auth.currentUser;
+    auth.authStateChanges().listen((user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  late final FirebaseAuth auth;
+  late final FirebaseFirestore firestore;
 
   User? _user;
   UserModel? _userModel;
@@ -48,18 +59,10 @@ class UserController with ChangeNotifier {
   }
 
   void logout() {
-    _auth.signOut();
+    auth.signOut();
     _user = null;
     _userModel = null;
     notifyListeners();
-  }
-
-  UserController() {
-    _user = _auth.currentUser;
-    _auth.authStateChanges().listen((user) {
-      _user = user;
-      notifyListeners();
-    });
   }
 
   // retorna o usuário logado
@@ -70,7 +73,7 @@ class UserController with ChangeNotifier {
 
   Future<User?> signIn(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -83,7 +86,7 @@ class UserController with ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
     _user = null;
     _userModel = null;
     notifyListeners();
@@ -95,7 +98,7 @@ class UserController with ChangeNotifier {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await auth.sendPasswordResetEmail(email: email);
     } catch (e) {
       rethrow;
     }
@@ -107,7 +110,7 @@ class UserController with ChangeNotifier {
         final base64Image = await imageFile.readAsBytes();
         final photoUrl = base64Encode(base64Image);
 
-        await _firestore.collection('users').doc(_user!.uid).update({
+        await firestore.collection('users').doc(_user!.uid).update({
           'profilePictureUrl': photoUrl,
         });
 
@@ -122,7 +125,7 @@ class UserController with ChangeNotifier {
 
   //remove profile photo
   Future<void> removeProfilePhoto() async {
-    await _firestore.collection('users').doc(_user!.uid).update({
+    await firestore.collection('users').doc(_user!.uid).update({
       'profilePictureUrl': null,
     });
 
@@ -132,7 +135,7 @@ class UserController with ChangeNotifier {
   }
 
   Future<UserModel?> loadUserProfile() async {
-    final userDoc = await _firestore.collection('users').doc(_user!.uid).get();
+    final userDoc = await firestore.collection('users').doc(_user!.uid).get();
     if (userDoc.exists) {
       _userModel = UserModel.fromJson(userDoc.data()!);
     }
@@ -143,7 +146,7 @@ class UserController with ChangeNotifier {
 
   Future<void> loadCompanyProfile() async {
     final companyDoc =
-        await _firestore.collection('companies').doc(_user!.uid).get();
+        await firestore.collection('companies').doc(_user!.uid).get();
     _companyModel = CompanyModel.fromJson(companyDoc.data() ?? {});
   }
 
