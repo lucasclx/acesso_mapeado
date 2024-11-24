@@ -3,9 +3,14 @@ import 'dart:io';
 
 import 'package:acesso_mapeado/models/company_model.dart';
 import 'package:acesso_mapeado/models/user_model.dart';
+import 'package:acesso_mapeado/shared/color_blindness_type.dart';
 import 'package:acesso_mapeado/shared/logger.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:color_blindness/color_blindness.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,6 +18,23 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class UserController with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  UserController({
+    required this.auth,
+    required this.firestore,
+    required this.providerColorBlindnessType,
+  }) {
+    _user = auth.currentUser;
+    auth.authStateChanges().listen((user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  late final FirebaseAuth auth;
+  late final FirebaseFirestore firestore;
+
+  final ProviderColorBlindnessType providerColorBlindnessType;
 
   User? _user;
   UserModel? _userModel;
@@ -28,6 +50,14 @@ class UserController with ChangeNotifier {
   void setUserPosition(LatLng position) {
     _userPosition = position;
     notifyListeners();
+  }
+
+  void setColorBlindnessTypeFromRemoteConfig() {
+    loadUserProfile().then((userModel) {
+      providerColorBlindnessType.setCurrentType(
+          userModel?.colorBlindnessType ?? ColorBlindnessType.none);
+      notifyListeners();
+    });
   }
 
   void setUser(User user) {
@@ -52,14 +82,6 @@ class UserController with ChangeNotifier {
     _user = null;
     _userModel = null;
     notifyListeners();
-  }
-
-  UserController() {
-    _user = _auth.currentUser;
-    _auth.authStateChanges().listen((user) {
-      _user = user;
-      notifyListeners();
-    });
   }
 
   // retorna o usuário logado

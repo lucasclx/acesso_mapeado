@@ -3,6 +3,7 @@ import 'package:acesso_mapeado/pages/company_home_page.dart';
 import 'package:acesso_mapeado/pages/home_page.dart';
 import 'package:acesso_mapeado/pages/onboarding_page.dart';
 import 'package:acesso_mapeado/shared/design_system.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,6 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.veryLightPurple,
       body: Container(
         alignment: Alignment.center,
         child: const Column(
