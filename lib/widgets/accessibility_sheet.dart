@@ -405,7 +405,20 @@ class _AccessibilitySheetState extends State<AccessibilitySheet> {
 
               // Skip if both open and close are "Fechado"
               if (weekDay.open == "Fechado" && weekDay.close == "Fechado") {
-                return const SizedBox.shrink();
+                const workingText = 'Fechado';
+                const workingTextColor = AppColors.darkGray;
+
+                return Semantics(
+                  label: 'Horário de funcionamento: ',
+                  child: ListTile(
+                    leading:
+                        Text(weekDay.day, style: const TextStyle(fontSize: 16)),
+                    trailing: const Text(
+                      workingText,
+                      style: TextStyle(fontSize: 14, color: workingTextColor),
+                    ),
+                  ),
+                );
               }
 
               final workingText = '${weekDay.open} até ${weekDay.close}';

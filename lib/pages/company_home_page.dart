@@ -16,15 +16,6 @@ import 'package:acesso_mapeado/pages/edit_company_profile_page.dart';
 class CompanyHomePage extends StatefulWidget {
   const CompanyHomePage({super.key});
 
-
-
-
-
-
-
-
-
-
   @override
   State<CompanyHomePage> createState() => _CompanyHomePageState();
 }
@@ -400,17 +391,34 @@ class _CompanyHomePageState extends State<CompanyHomePage> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: workingHours.length,
       itemBuilder: (context, index) {
-        final workingText =
-            '${workingHours[index].open} até ${workingHours[index].close}';
-        final workingTextColor =
-            workingHours[index].open != workingHours[index].close
-                ? colorBlindnessColorScheme(
-                        ColorScheme.fromSeed(seedColor: AppColors.green),
-                        Provider.of<ProviderColorBlindnessType>(context)
-                            .getCurrentType())
-                    .primary
-                : AppColors.darkGray;
         final weekDay = workingHours[index];
+
+        // Skip if both open and close are "Fechado"
+        if (weekDay.open == "Fechado" && weekDay.close == "Fechado") {
+          const workingText = 'Fechado';
+          const workingTextColor = AppColors.darkGray;
+
+          return Semantics(
+            label: 'Horário de funcionamento: ',
+            child: ListTile(
+              leading: Text(weekDay.day, style: const TextStyle(fontSize: 16)),
+              trailing: const Text(
+                workingText,
+                style: TextStyle(fontSize: 14, color: workingTextColor),
+              ),
+            ),
+          );
+        }
+
+        final workingText = '${weekDay.open} até ${weekDay.close}';
+        final workingTextColor = weekDay.open != weekDay.close
+            ? colorBlindnessColorScheme(
+                    ColorScheme.fromSeed(seedColor: AppColors.green),
+                    Provider.of<ProviderColorBlindnessType>(context)
+                        .getCurrentType())
+                .primary
+            : AppColors.darkGray;
+
         return Semantics(
           label: 'Horário de funcionamento: ',
           child: ListTile(

@@ -219,6 +219,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
             children: [
               ListTile(
                 leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
                   child: Icon(Icons.photo_library,
                       color: Theme.of(context).colorScheme.primary),
                 ),
@@ -233,6 +234,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
                   child: Icon(Icons.camera_alt,
                       color: Theme.of(context).colorScheme.primary),
                 ),
@@ -247,6 +249,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
               ),
               ListTile(
                 leading: CircleAvatar(
+                  backgroundColor: AppColors.darkGray,
                   child: Icon(Icons.delete,
                       color: Theme.of(context).colorScheme.primary),
                 ),

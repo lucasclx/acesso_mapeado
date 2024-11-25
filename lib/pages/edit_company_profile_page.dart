@@ -919,14 +919,13 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
       String open = _openingTimeControllers[day]!.text;
       String close = _closingTimeControllers[day]!.text;
 
-      if (open.isNotEmpty || close.isNotEmpty) {
-        data.add({
-          'day': day,
-          'open': open.isNotEmpty ? open : 'Fechado',
-          'close': close.isNotEmpty ? close : 'Fechado',
-        });
-      }
+      data.add({
+        'day': day,
+        'open': open.isNotEmpty ? open : 'Fechado',
+        'close': close.isNotEmpty ? close : 'Fechado',
+      });
     }
+
     return data;
   }
 
