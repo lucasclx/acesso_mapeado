@@ -16,12 +16,22 @@ import 'package:acesso_mapeado/pages/edit_company_profile_page.dart';
 class CompanyHomePage extends StatefulWidget {
   const CompanyHomePage({super.key});
 
+
+
+
+
+
+
+
+
+
   @override
   State<CompanyHomePage> createState() => _CompanyHomePageState();
 }
 
 class _CompanyHomePageState extends State<CompanyHomePage> {
   CompanyModel? companyData;
+
   bool isLoading = true;
 
   @override

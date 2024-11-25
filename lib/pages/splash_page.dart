@@ -32,19 +32,25 @@ class _SplashPageState extends State<SplashPage> {
 
     final user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      final userProfile = await userController.loadUserProfile();
-      if (userProfile != null) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomePage()));
-      } else {
-        await userController.loadCompanyProfile();
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const CompanyHomePage()));
-      }
-    } else {
+    if (user == null && mounted) {
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (context) => const OnboardingPage()));
+      return;
+    }
+
+    final userProfile = await userController.loadUserProfile();
+
+    if (userProfile != null && mounted) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomePage()));
+      return;
+    }
+
+    await userController.loadCompanyProfile();
+
+    if (mounted) {
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (context) => const CompanyHomePage()));
     }
   }
 

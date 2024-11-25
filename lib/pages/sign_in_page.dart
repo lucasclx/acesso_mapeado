@@ -48,28 +48,32 @@ class _SignInPageState extends State<SignInPage> {
 
         if (companyData.exists) {
           final companyModel = CompanyModel.fromJson(companyData.data()!);
-          Provider.of<UserController>(context, listen: false)
-              .updateCompanyModel(companyModel);
+          if (mounted) {
+            Provider.of<UserController>(context, listen: false)
+                .updateCompanyModel(companyModel);
 
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const CompanyHomePage()),
-            (Route<dynamic> route) => false,
-          );
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const CompanyHomePage()),
+              (Route<dynamic> route) => false,
+            );
+          }
         } else {
           final userData = await FirebaseFirestore.instance
               .collection('users')
               .doc(user.uid)
               .get();
           final userModel = UserModel.fromJson(userData.data()!);
-          Provider.of<UserController>(context, listen: false)
-              .updateUserModel(userModel);
+          if (mounted) {
+            Provider.of<UserController>(context, listen: false)
+                .updateUserModel(userModel);
 
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomePage()),
-            (Route<dynamic> route) => false,
-          );
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (Route<dynamic> route) => false,
+            );
+          }
         }
       }
     } on Exception catch (e) {

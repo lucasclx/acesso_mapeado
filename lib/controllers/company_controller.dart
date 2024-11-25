@@ -26,7 +26,7 @@ class CompanyController with ChangeNotifier {
 
   Future<CompanyModel?> loadCompanyData() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = auth.currentUser;
       if (user == null) throw Exception('Usuário não autenticado');
 
       final doc = await _companiesCollection.doc(user.uid).get();
@@ -59,7 +59,7 @@ class CompanyController with ChangeNotifier {
     required Map<String, dynamic> workingHours,
   }) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final user = auth.currentUser;
       if (user == null) throw Exception('Usuário não autenticado');
 
       await _companiesCollection.doc(user.uid).update({
@@ -100,8 +100,7 @@ class CompanyController with ChangeNotifier {
   // Função para obter todas as empresas
   Future<List<CompanyModel>> getAllCompanies() async {
     try {
-      final response =
-          await FirebaseFirestore.instance.collection('companies').get();
+      final response = await _companiesCollection.get();
 
       List<CompanyModel> companies = response.docs.map((doc) {
         Logger.logInfo('Lista de empresas');
@@ -164,7 +163,7 @@ class CompanyController with ChangeNotifier {
   // Função que cria a empresa
   Future<bool> createCompany(CompanyModel company) async {
     try {
-      // Logger.logInfo('Document ID: ${docRef.id}');
+      await _companiesCollection.add(company.toJson());
       return true;
     } catch (error) {
       Logger.logInfo('Error adding document: $error');

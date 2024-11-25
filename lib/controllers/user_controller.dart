@@ -16,8 +16,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class UserController with ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late final FirebaseAuth auth;
+  late final FirebaseFirestore firestore;
 
   UserController({
     required this.auth,
@@ -30,10 +30,6 @@ class UserController with ChangeNotifier {
       notifyListeners();
     });
   }
-
-  late final FirebaseAuth auth;
-  late final FirebaseFirestore firestore;
-
   final ProviderColorBlindnessType providerColorBlindnessType;
 
   User? _user;
@@ -78,7 +74,7 @@ class UserController with ChangeNotifier {
   }
 
   void logout() {
-    _auth.signOut();
+    auth.signOut();
     _user = null;
     _userModel = null;
     notifyListeners();
@@ -92,7 +88,7 @@ class UserController with ChangeNotifier {
 
   Future<User?> signIn(String email, String password) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -105,7 +101,7 @@ class UserController with ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
     _user = null;
     _userModel = null;
     notifyListeners();
@@ -117,7 +113,7 @@ class UserController with ChangeNotifier {
 
   Future<void> resetPassword(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await auth.sendPasswordResetEmail(email: email);
     } catch (e) {
       rethrow;
     }
@@ -129,7 +125,7 @@ class UserController with ChangeNotifier {
         final base64Image = await imageFile.readAsBytes();
         final photoUrl = base64Encode(base64Image);
 
-        await _firestore.collection('users').doc(_user!.uid).update({
+        await firestore.collection('users').doc(_user!.uid).update({
           'profilePictureUrl': photoUrl,
         });
 
@@ -144,7 +140,7 @@ class UserController with ChangeNotifier {
 
   //remove profile photo
   Future<void> removeProfilePhoto() async {
-    await _firestore.collection('users').doc(_user!.uid).update({
+    await firestore.collection('users').doc(_user!.uid).update({
       'profilePictureUrl': null,
     });
 
@@ -154,7 +150,7 @@ class UserController with ChangeNotifier {
   }
 
   Future<UserModel?> loadUserProfile() async {
-    final userDoc = await _firestore.collection('users').doc(_user!.uid).get();
+    final userDoc = await firestore.collection('users').doc(_user!.uid).get();
     if (userDoc.exists) {
       _userModel = UserModel.fromJson(userDoc.data()!);
     }
@@ -165,7 +161,7 @@ class UserController with ChangeNotifier {
 
   Future<void> loadCompanyProfile() async {
     final companyDoc =
-        await _firestore.collection('companies').doc(_user!.uid).get();
+        await firestore.collection('companies').doc(_user!.uid).get();
     _companyModel = CompanyModel.fromJson(companyDoc.data() ?? {});
   }
 
