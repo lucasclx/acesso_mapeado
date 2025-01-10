@@ -80,7 +80,7 @@ class _EditCompanyProfilePageState extends State<EditCompanyProfilePage> {
       {"tipo": "Elevadores", "status": false},
       {"tipo": "Portas Largas", "status": false},
       {"tipo": "Banheiros Adaptados", "status": false},
-      {"tipo": "Pisos e Superfícies Anti-derrapantes", "status": false},
+      {"tipo": "Pisos Táteis e Superfícies Anti-derrapantes", "status": false},
       {"tipo": "Estacionamento Reservado", "status": false}
     ],
     "Acessibilidade Comunicacional": [
